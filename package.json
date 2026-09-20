@@ -2,7 +2,7 @@
   "name": "mobile-app-market",
   "version": "0.0.1",
   "description": "Мобильный товарный маркетплейс на Quasar + Capacitor",
-  "productName": "Маркет",
+  "productName": "QAZAN",
   "author": "Islam israilov <islamisrailov0@gmail.com>",
   "type": "module",
   "private": true,

@@ -15,27 +15,25 @@
         </template>
       </q-input>
 
-      <div class="row no-wrap q-mt-sm q-gutter-xs scroll-x">
-        <q-chip
-          :outline="Boolean(categoryId)"
-          :color="categoryId ? 'white' : 'primary'"
-          :text-color="categoryId ? 'dark' : 'white'"
-          clickable
+      <div class="catalog-page__cats">
+        <button
+          type="button"
+          class="cat-chip"
+          :class="{ 'cat-chip--active': !categoryId }"
           @click="selectCategory(undefined)"
         >
           Все
-        </q-chip>
-        <q-chip
+        </button>
+        <button
           v-for="category in catalog.categories"
           :key="category.id"
-          :outline="categoryId !== category.id"
-          :color="categoryId === category.id ? 'primary' : 'white'"
-          :text-color="categoryId === category.id ? 'white' : 'dark'"
-          clickable
+          type="button"
+          class="cat-chip"
+          :class="{ 'cat-chip--active': categoryId === category.id }"
           @click="selectCategory(category.id)"
         >
           {{ category.title }}
-        </q-chip>
+        </button>
       </div>
 
       <div class="row items-center justify-between q-mt-sm">
@@ -188,9 +186,39 @@ function onResetFilters() {
   z-index: 2;
 }
 
-.scroll-x {
+.catalog-page__cats {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
   overflow-x: auto;
-  padding-bottom: 2px;
+  overflow-y: hidden;
+  margin: 10px -16px 0;
+  padding: 2px 16px 6px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.catalog-page__cats::-webkit-scrollbar {
+  display: none;
+}
+
+.cat-chip {
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--app-text);
+  background: #eef0f5;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cat-chip--active {
+  color: #fff;
+  background: #005bff;
 }
 
 .product-grid {

@@ -46,7 +46,10 @@
         </q-item>
       </q-list>
 
-      <div class="text-center text-caption muted q-mt-lg">Маркет · UI-оболочка · mock-данные</div>
+      <div class="profile-brand">
+        <img src="@/assets/brand/qazan-mark.svg" alt="" />
+        QAZAN · mock-данные
+      </div>
     </div>
   </q-page>
 </template>
@@ -86,5 +89,20 @@ const orderCaption = computed(() =>
 .page-header {
   padding: 16px 16px 8px;
   background: #fff;
+}
+
+.profile-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 28px;
+  color: var(--app-muted);
+  font-size: 12px;
+}
+
+.profile-brand img {
+  width: 22px;
+  height: 22px;
 }
 </style>

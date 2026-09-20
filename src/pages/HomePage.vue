@@ -3,8 +3,8 @@
     <div class="home-page__top safe-top">
       <div class="row items-center justify-between q-mb-sm">
         <div>
-          <div class="text-caption muted">Доставка в</div>
-          <div class="text-weight-bold">{{ city }}</div>
+          <img class="home-logo" src="@/assets/brand/qazan-logo.svg" alt="QAZAN" />
+          <div class="text-caption muted">Доставка в <span class="text-dark text-weight-bold">{{ city }}</span></div>
         </div>
         <q-btn flat round icon="notifications" color="dark" />
       </div>
@@ -12,7 +12,7 @@
         v-model="query"
         dense
         outlined
-        placeholder="Искать в Маркете"
+        placeholder="Искать в QAZAN"
         class="search-field bg-white"
         bg-color="white"
         @keyup.enter="goSearch"
@@ -28,7 +28,6 @@
 
     <div class="page-pad">
       <template v-if="catalog.loading && !catalog.loaded">
-        <q-skeleton height="148px" class="rounded-borders q-mb-md" />
         <div class="row q-col-gutter-sm">
           <div v-for="n in 8" :key="n" class="col-3">
             <q-skeleton type="circle" size="48px" class="q-mx-auto" />
@@ -38,7 +37,6 @@
       </template>
 
       <template v-else>
-        <BannerCarousel :banners="catalog.banners" class="q-mb-md" />
         <CategoryGrid :categories="catalog.categories" @select="openCategory" />
 
         <div class="section-title">
@@ -61,7 +59,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import BannerCarousel from '@/components/BannerCarousel.vue';
 import CategoryGrid from '@/components/CategoryGrid.vue';
 import ProductCard from '@/components/ProductCard.vue';
 import { useCatalogStore } from '@/stores/catalog';
@@ -91,6 +88,13 @@ function goSearch() {
 .home-page__top {
   padding: 12px 16px 8px;
   background: #fff;
+}
+
+.home-logo {
+  display: block;
+  height: 28px;
+  width: auto;
+  margin-bottom: 4px;
 }
 
 .product-grid {

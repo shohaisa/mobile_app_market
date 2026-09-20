@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img">
+  <title>QAZAN</title>
+  <rect width="64" height="64" rx="14" fill="#005bff"/>
+  <g fill="#ffffff" stroke="none" transform="translate(5.8 5.4) scale(0.82)">
+    <path fill-rule="evenodd" d="M 48.5 27.4 A 20.5 20.5 0 0 1 28 47.9 A 20.5 20.5 0 0 1 7.5 27.4 A 20.5 20.5 0 0 1 28 6.9 A 20.5 20.5 0 0 1 48.5 27.4Z M 37.7 26.6 A 9.7 9.7 0 0 1 28 36.3 A 9.7 9.7 0 0 1 18.3 26.6 A 9.7 9.7 0 0 1 28 16.9 A 9.7 9.7 0 0 1 37.7 26.6Z"/>
+    <circle cx="18.94" cy="25.33" r="3.05"/>
+    <circle cx="37.06" cy="25.33" r="3.05"/>
+    <path fill="none" stroke="#ffffff" stroke-width="7.2" stroke-linecap="round" d="M 40.38 38.16 L 55.32 51.15"/>
+  </g>
+</svg>
