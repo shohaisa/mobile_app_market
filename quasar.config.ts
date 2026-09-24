@@ -48,6 +48,10 @@ export default defineConfig((/* ctx */) => {
         // extendTsConfig (tsConfig) {}
       },
 
+      env: {
+        clientPrefix: ['QCLI_', 'VITE_']
+      },
+
       // https://v2.quasar.dev/quasar-cli-vite/page-routing-with-vue-router#filename-based-routing
       // filenameBasedRouting: true,
 
