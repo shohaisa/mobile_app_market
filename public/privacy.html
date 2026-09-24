@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Политика конфиденциальности — QAZAN</title>
+    <meta
+      name="description"
+      content="Политика конфиденциальности мобильного приложения QAZAN / QAZAN Privacy Policy"
+    />
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png" />
+    <link rel="icon" type="image/ico" href="favicon.ico" />
+    <style>
+      :root {
+        --bg: #f3f4f8;
+        --card: #ffffff;
+        --text: #12141a;
+        --muted: #8b8d97;
+        --line: #eceef3;
+        --blue: #005bff;
+        --blue-soft: #e8f0ff;
+        --radius: 16px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--text);
+        background: var(--bg);
+        font-family:
+          Inter, Roboto, system-ui, -apple-system, 'Segoe UI', sans-serif;
+        line-height: 1.55;
+      }
+
+      a {
+        color: var(--blue);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      code {
+        white-space: nowrap;
+        font-size: 0.95em;
+      }
+
+      .top {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .top-inner,
+      .wrap {
+        width: min(760px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .top-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 64px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: inherit;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-decoration: none;
+      }
+
+      .brand svg {
+        width: 28px;
+        height: 28px;
+      }
+
+      .langs {
+        display: flex;
+        padding: 3px;
+        background: var(--bg);
+        border-radius: 999px;
+      }
+
+      .langs a {
+        min-width: 44px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+        text-align: center;
+        text-decoration: none;
+      }
+
+      html[lang='ru'] .langs a[href='#ru'],
+      html[lang='en'] .langs a[href='#en'] {
+        color: #fff;
+        background: var(--blue);
+      }
+
+      .hero {
+        padding: 28px 0 8px;
+      }
+
+      .kicker {
+        display: inline-flex;
+        margin-bottom: 12px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: var(--blue-soft);
+        color: var(--blue);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: clamp(28px, 5vw, 40px);
+        line-height: 1.15;
+        letter-spacing: -0.03em;
+      }
+
+      .meta {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .panel {
+        display: none;
+        padding-bottom: 64px;
+      }
+
+      #ru {
+        display: block;
+      }
+
+      body:has(#en:target) #ru,
+      html[lang='en'] #ru {
+        display: none;
+      }
+
+      body:has(#en:target) #en,
+      html[lang='en'] #en {
+        display: block;
+      }
+
+      body:has(#ru:target) #ru,
+      html[lang='ru'] #ru {
+        display: block;
+      }
+
+      body:has(#ru:target) #en,
+      html[lang='ru'] #en {
+        display: none;
+      }
+
+      .card {
+        margin-top: 20px;
+        padding: 8px 22px 22px;
+        background: var(--card);
+        border-radius: var(--radius);
+        box-shadow: 0 8px 24px rgba(16, 24, 40, 0.04);
+      }
+
+      section + section {
+        border-top: 1px solid var(--line);
+      }
+
+      h2 {
+        margin: 0;
+        padding-top: 22px;
+        font-size: 18px;
+      }
+
+      p,
+      ul {
+        color: #3a3d46;
+      }
+
+      ul {
+        padding-left: 18px;
+      }
+
+      li + li {
+        margin-top: 6px;
+      }
+
+      .note {
+        margin-top: 18px;
+        padding: 14px 16px;
+        border-radius: 12px;
+        background: var(--blue-soft);
+        color: #163a8a;
+        font-size: 14px;
+      }
+
+      footer {
+        padding: 0 0 40px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top">
+      <div class="top-inner">
+        <div class="brand">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true">
+            <g fill="#005bff" stroke="none">
+              <path
+                fill-rule="evenodd"
+                d="M 48.5 27.4 A 20.5 20.5 0 0 1 28 47.9 A 20.5 20.5 0 0 1 7.5 27.4 A 20.5 20.5 0 0 1 28 6.9 A 20.5 20.5 0 0 1 48.5 27.4Z M 37.7 26.6 A 9.7 9.7 0 0 1 28 36.3 A 9.7 9.7 0 0 1 18.3 26.6 A 9.7 9.7 0 0 1 28 16.9 A 9.7 9.7 0 0 1 37.7 26.6Z"
+              />
+              <circle cx="18.94" cy="25.33" r="3.05" />
+              <circle cx="37.06" cy="25.33" r="3.05" />
+              <path
+                fill="none"
+                stroke="#005bff"
+                stroke-width="7.2"
+                stroke-linecap="round"
+                d="M 40.38 38.16 L 55.32 51.15"
+              />
+            </g>
+          </svg>
+          QAZAN
+        </div>
+        <nav class="langs" aria-label="Language">
+          <a href="#ru" data-lang="ru">RU</a>
+          <a href="#en" data-lang="en">EN</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <article id="ru" class="panel" lang="ru">
+        <div class="hero">
+          <div class="kicker">Документ</div>
+          <h1>Политика конфиденциальности</h1>
+          <p class="meta">Приложение QAZAN · дата вступления в силу: 20 сентября 2026 г.</p>
+        </div>
+
+        <div class="card">
+          <section>
+            <h2>1. Кто мы</h2>
+            <p>
+              QAZAN — мобильное приложение товарного маркетплейса (пакет
+              <code>com.qazan.myapp</code>). Оператором персональных данных является Islam Israilov.
+            </p>
+            <p>
+              По вопросам обработки данных пишите на
+              <a href="mailto:islamisrailov0@gmail.com">islamisrailov0@gmail.com</a>.
+            </p>
+          </section>
+
+          <section>
+            <h2>2. Какие данные мы обрабатываем</h2>
+            <p>В зависимости от того, какими функциями вы пользуетесь, мы можем обрабатывать:</p>
+            <ul>
+              <li>данные профиля: имя, номер телефона, адрес электронной почты;</li>
+              <li>адреса доставки: город, улица, квартира, комментарий к адресу;</li>
+              <li>
+                сведения о заказах: состав корзины, способ доставки и оплаты, статус заказа;
+              </li>
+              <li>
+                настройки приложения: избранные товары, содержимое корзины, предпочтения
+                уведомлений;
+              </li>
+              <li>
+                технические данные: тип устройства, версия ОС и приложения, служебные
+                идентификаторы, необходимые для работы сервиса.
+              </li>
+            </ul>
+            <p>
+              Часть этих сведений сохраняется локально на устройстве (в хранилище приложения или
+              в браузере).
+            </p>
+          </section>
+
+          <section>
+            <h2>3. Для чего нужны данные</h2>
+            <ul>
+              <li>создание и ведение профиля;</li>
+              <li>оформление, доставка и сопровождение заказов;</li>
+              <li>связь с вами по заказу или работе сервиса;</li>
+              <li>сохранение корзины и избранного между сессиями;</li>
+              <li>устойчивая работа приложения, диагностика ошибок и улучшение сервиса;</li>
+              <li>сервисные уведомления, если вы их включили.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>4. Где хранятся данные</h2>
+            <p>
+              Корзина, избранное и часть настроек хранятся на вашем устройстве. Если функция
+              требует обращения к серверу (каталог, профиль, оформление заказа), данные могут
+              передаваться на наши серверы и обрабатываться для оказания услуги.
+            </p>
+          </section>
+
+          <section>
+            <h2>5. Передача третьим лицам</h2>
+            <p>Мы не продаём персональные данные. Передача возможна только если это нужно для услуги или требуется законом:</p>
+            <ul>
+              <li>службам доставки — адрес и контакты, чтобы привезти заказ;</li>
+              <li>
+                платёжным провайдерам — сведения, необходимые для оплаты. Полные данные банковской
+                карты мы не храним, если платёж проходит через провайдера;
+              </li>
+              <li>магазинам приложений (включая Google Play) — в рамках их правил и инфраструктуры;</li>
+              <li>государственным органам — при наличии законного требования.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>6. Разрешения устройства</h2>
+            <p>
+              Приложению нужен доступ в интернет, чтобы загружать каталог и обмениваться данными с
+              сервером. Другие разрешения запрашиваются только если это требуется конкретной
+              функции, и вы можете отказать.
+            </p>
+          </section>
+
+          <section>
+            <h2>7. Срок хранения</h2>
+            <p>
+              Данные хранятся, пока вы пользуетесь сервисом, а также столько, сколько нужно для
+              исполнения заказа, рассмотрения претензий и соблюдения закона. Локальные данные
+              можно удалить, очистив данные приложения или удалив само приложение.
+            </p>
+          </section>
+
+          <section>
+            <h2>8. Ваши права</h2>
+            <p>
+              Вы можете запросить доступ к своим данным, их уточнение или удаление, а также
+              отозвать согласие на обработку. Для этого напишите на
+              <a href="mailto:islamisrailov0@gmail.com">islamisrailov0@gmail.com</a>.
+            </p>
+          </section>
+
+          <section>
+            <h2>9. Дети</h2>
+            <p>
+              Приложение не предназначено для детей младше 16 лет. Мы сознательно не собираем
+              данные детей.
+            </p>
+          </section>
+
+          <section>
+            <h2>10. Изменения</h2>
+            <p>
+              Актуальная версия политики всегда опубликована на этой странице. Продолжая
+              пользоваться приложением после обновления, вы принимаете новую редакцию.
+            </p>
+            <p class="note">
+              Если у вас остались вопросы по персональным данным, напишите нам:
+              <a href="mailto:islamisrailov0@gmail.com">islamisrailov0@gmail.com</a>
+            </p>
+          </section>
+        </div>
+      </article>
+
+      <article id="en" class="panel" lang="en" hidden>
+        <div class="hero">
+          <div class="kicker">Document</div>
+          <h1>Privacy Policy</h1>
+          <p class="meta">QAZAN app · effective date: 20 September 2026</p>
+        </div>
+
+        <div class="card">
+          <section>
+            <h2>1. Who we are</h2>
+            <p>
+              QAZAN is a mobile marketplace app (package <code>com.qazan.myapp</code>). The personal
+              data operator is Islam Israilov.
+            </p>
+            <p>
+              For privacy requests, email
+              <a href="mailto:islamisrailov0@gmail.com">islamisrailov0@gmail.com</a>.
+            </p>
+          </section>
+
+          <section>
+            <h2>2. Data we process</h2>
+            <p>Depending on the features you use, we may process:</p>
+            <ul>
+              <li>profile data: name, phone number, email address;</li>
+              <li>delivery addresses: city, street, apartment, address comment;</li>
+              <li>order details: cart contents, delivery and payment method, order status;</li>
+              <li>
+                app preferences: favourite products, cart contents, notification settings;
+              </li>
+              <li>
+                technical data: device type, OS and app version, and identifiers needed to run
+                the service.
+              </li>
+            </ul>
+            <p>
+              Some of this information is stored locally on your device (in the app’s storage or in
+              the browser).
+            </p>
+          </section>
+
+          <section>
+            <h2>3. Why we use data</h2>
+            <ul>
+              <li>to create and maintain your profile;</li>
+              <li>to place, deliver, and support orders;</li>
+              <li>to contact you about an order or the service;</li>
+              <li>to keep your cart and favourites between sessions;</li>
+              <li>to keep the app stable, diagnose issues, and improve the service;</li>
+              <li>to send service notifications if you enable them.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>4. Where data is stored</h2>
+            <p>
+              The cart, favourites, and some settings are stored on your device. If a feature
+              needs a server (catalogue, profile, checkout), data may be sent to our servers and
+              processed to provide the service.
+            </p>
+          </section>
+
+          <section>
+            <h2>5. Sharing with third parties</h2>
+            <p>
+              We do not sell personal data. We may share it only when needed to provide the
+              service or required by law:
+            </p>
+            <ul>
+              <li>delivery partners — address and contact details to deliver an order;</li>
+              <li>
+                payment providers — information needed to process a payment. We do not store full
+                bank card details when payment is handled by a provider;
+              </li>
+              <li>app stores (including Google Play) — under their rules and infrastructure;</li>
+              <li>public authorities — where legally required.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>6. Device permissions</h2>
+            <p>
+              The app needs internet access to load the catalogue and exchange data with the
+              server. Other permissions are requested only when a specific feature needs them,
+              and you can decline.
+            </p>
+          </section>
+
+          <section>
+            <h2>7. Retention</h2>
+            <p>
+              We keep data while you use the service and for as long as needed to fulfil orders,
+              handle claims, and comply with the law. You can delete local data by clearing the
+              app data or uninstalling the app.
+            </p>
+          </section>
+
+          <section>
+            <h2>8. Your rights</h2>
+            <p>
+              You may request access to your data, correction, deletion, or withdrawal of
+              consent. Email
+              <a href="mailto:islamisrailov0@gmail.com">islamisrailov0@gmail.com</a>.
+            </p>
+          </section>
+
+          <section>
+            <h2>9. Children</h2>
+            <p>
+              The app is not intended for children under 16. We do not knowingly collect
+              children’s data.
+            </p>
+          </section>
+
+          <section>
+            <h2>10. Changes</h2>
+            <p>
+              The current version of this policy is always published on this page. Continued use
+              of the app after an update means you accept the revised policy.
+            </p>
+            <p class="note">
+              Questions about personal data:
+              <a href="mailto:islamisrailov0@gmail.com">islamisrailov0@gmail.com</a>
+            </p>
+          </section>
+        </div>
+      </article>
+
+      <footer>
+        © 2026 QAZAN ·
+        <span data-foot-ru>Политика конфиденциальности</span>
+        <span data-foot-en hidden>Privacy Policy</span>
+      </footer>
+    </main>
+
+    <script>
+      (function () {
+        var root = document.documentElement;
+        var ruFoot = document.querySelector('[data-foot-ru]');
+        var enFoot = document.querySelector('[data-foot-en]');
+        var ruPanel = document.getElementById('ru');
+        var enPanel = document.getElementById('en');
+
+        function apply(lang) {
+          var next = lang === 'en' ? 'en' : 'ru';
+          root.lang = next;
+          document.title =
+            next === 'en'
+              ? 'Privacy Policy — QAZAN'
+              : 'Политика конфиденциальности — QAZAN';
+          if (ruPanel && enPanel) {
+            ruPanel.hidden = next !== 'ru';
+            enPanel.hidden = next !== 'en';
+          }
+          if (ruFoot && enFoot) {
+            ruFoot.hidden = next !== 'ru';
+            enFoot.hidden = next !== 'en';
+          }
+          try {
+            localStorage.setItem('qazan-privacy-lang', next);
+          } catch (e) {}
+        }
+
+        function fromLocation() {
+          var hash = (location.hash || '').replace('#', '');
+          if (hash === 'en' || hash === 'ru') return hash;
+          var query = new URLSearchParams(location.search).get('lang');
+          if (query === 'en' || query === 'ru') return query;
+          try {
+            var saved = localStorage.getItem('qazan-privacy-lang');
+            if (saved === 'en' || saved === 'ru') return saved;
+          } catch (e) {}
+          return (navigator.language || '').toLowerCase().startsWith('en') ? 'en' : 'ru';
+        }
+
+        apply(fromLocation());
+        if (!location.hash) {
+          history.replaceState(null, '', '#' + root.lang);
+        }
+
+        window.addEventListener('hashchange', function () {
+          apply(fromLocation());
+        });
+      })();
+    </script>
+  </body>
+</html>
