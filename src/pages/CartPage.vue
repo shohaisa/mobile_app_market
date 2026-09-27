@@ -90,6 +90,7 @@ async function applyPromo() {
 <style scoped lang="scss">
 .page-header {
   padding: 16px 16px 8px;
+  padding-top: calc(16px + var(--safe-area-inset-top, env(safe-area-inset-top, 0px)));
   background: #fff;
 }
 

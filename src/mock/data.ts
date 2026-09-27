@@ -1,7 +1,6 @@
 import type {
   Address,
   Banner,
-  Category,
   DeliveryOption,
   Order,
   PaymentOption,
@@ -12,17 +11,6 @@ import type {
 function img(path: string, n = 1): string {
   return `https://cdn.dummyjson.com/product-images/${path}/${n}.webp`;
 }
-
-export const categories: Category[] = [
-  { id: 'electronics', title: 'Электроника', icon: 'devices', color: '#005bff' },
-  { id: 'clothes', title: 'Одежда', icon: 'checkroom', color: '#7c3aed' },
-  { id: 'home', title: 'Дом и кухня', icon: 'kitchen', color: '#0d9488' },
-  { id: 'beauty', title: 'Красота', icon: 'spa', color: '#db2777' },
-  { id: 'sport', title: 'Спорт', icon: 'fitness_center', color: '#ea580c' },
-  { id: 'kids', title: 'Детям', icon: 'child_care', color: '#2563eb' },
-  { id: 'food', title: 'Продукты', icon: 'restaurant', color: '#16a34a' },
-  { id: 'books', title: 'Книги', icon: 'menu_book', color: '#ca8a04' },
-];
 
 export const banners: Banner[] = [
   {

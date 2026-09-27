@@ -9,5 +9,11 @@ export default defineCapacitorConfig({
   },
   server: {
     androidScheme: 'https'
+  },
+  plugins: {
+    SystemBars: {
+      insetsHandling: 'css',
+      initialViewportFitValueHint: 'cover'
+    }
   }
 });

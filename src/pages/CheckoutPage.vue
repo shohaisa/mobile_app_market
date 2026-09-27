@@ -163,6 +163,7 @@ async function submit() {
 <style scoped lang="scss">
 .page-header {
   padding: 8px 8px 8px 0;
+  padding-top: calc(8px + var(--safe-area-inset-top, env(safe-area-inset-top, 0px)));
   background: #fff;
   gap: 4px;
 }

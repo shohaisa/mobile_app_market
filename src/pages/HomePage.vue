@@ -87,6 +87,7 @@ function goSearch() {
 <style scoped lang="scss">
 .home-page__top {
   padding: 12px 16px 8px;
+  padding-top: calc(12px + var(--safe-area-inset-top, env(safe-area-inset-top, 0px)));
   background: #fff;
 }
 

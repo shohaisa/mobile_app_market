@@ -187,7 +187,7 @@ async function addToCart() {
 .product-page__back,
 .product-page__fav {
   position: absolute;
-  top: 16px;
+  top: calc(16px + var(--safe-area-inset-top, env(safe-area-inset-top, 0px)));
   z-index: 2;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }

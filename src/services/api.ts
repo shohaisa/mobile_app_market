@@ -1,7 +1,6 @@
 import {
   addresses,
   banners,
-  categories,
   currentUser,
   deliveryOptions,
   initialOrders,
@@ -11,7 +10,6 @@ import {
 import type {
   Address,
   Banner,
-  Category,
   DeliveryOption,
   Order,
   PaymentOption,
@@ -26,11 +24,6 @@ function wait(ms = 220): Promise<void> {
 }
 
 export const api = {
-  async getCategories(): Promise<Category[]> {
-    await wait();
-    return categories;
-  },
-
   async getBanners(): Promise<Banner[]> {
     await wait();
     return banners;
