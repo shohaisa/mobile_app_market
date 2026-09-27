@@ -1,6 +1,8 @@
 export interface Category {
   id: string;
   title: string;
+  parentId: string | null;
+  children: Category[];
   icon: string;
   color: string;
 }

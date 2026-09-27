@@ -1,6 +1,7 @@
 import { defineStore, acceptHMRUpdate } from 'pinia';
 import { computed, ref } from 'vue';
 import { api } from '@/services/api';
+import { fetchCategories } from '@/services/categories';
 import type { Banner, Category, Product } from '@/types/marketplace';
 
 export const useCatalogStore = defineStore('catalog', () => {
@@ -24,10 +25,10 @@ export const useCatalogStore = defineStore('catalog', () => {
     }
     loading.value = true;
     try {
-      const [nextProducts, nextCategories, nextBanners] = await Promise.all([
+      const [nextProducts, nextBanners, nextCategories] = await Promise.all([
         api.getProducts(),
-        api.getCategories(),
         api.getBanners(),
+        fetchCategories().catch(() => [] as Category[]),
       ]);
       products.value = nextProducts;
       categories.value = nextCategories;
@@ -43,7 +44,39 @@ export const useCatalogStore = defineStore('catalog', () => {
   }
 
   function categoryById(id: string): Category | undefined {
-    return categories.value.find((item) => item.id === id);
+    const walk = (nodes: Category[]): Category | undefined => {
+      for (const node of nodes) {
+        if (node.id === id) {
+          return node;
+        }
+        const child = walk(node.children);
+        if (child) {
+          return child;
+        }
+      }
+      return undefined;
+    };
+
+    return walk(categories.value);
+  }
+
+  function categoriesAt(id?: string): Category[] {
+    if (!id) {
+      return categories.value;
+    }
+
+    const current = categoryById(id);
+    if (!current) {
+      return categories.value;
+    }
+    if (current.children.length) {
+      return current.children;
+    }
+    if (!current.parentId) {
+      return categories.value;
+    }
+
+    return categoryById(current.parentId)?.children ?? categories.value;
   }
 
   function productsByCategory(categoryId?: string): Product[] {
@@ -77,6 +110,7 @@ export const useCatalogStore = defineStore('catalog', () => {
     fetchAll,
     productById,
     categoryById,
+    categoriesAt,
     productsByCategory,
     search,
   };

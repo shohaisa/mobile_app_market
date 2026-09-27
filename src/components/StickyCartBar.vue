@@ -37,7 +37,7 @@ defineEmits<{ add: [] }>();
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 16px calc(12px + env(safe-area-inset-bottom));
+  padding: 10px 16px calc(12px + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
   background: rgba(255, 255, 255, 0.96);
   border-top: 1px solid var(--app-line);
   backdrop-filter: blur(16px);

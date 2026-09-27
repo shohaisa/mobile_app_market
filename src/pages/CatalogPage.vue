@@ -25,7 +25,7 @@
           Все
         </button>
         <button
-          v-for="category in catalog.categories"
+          v-for="category in levelCategories"
           :key="category.id"
           type="button"
           class="cat-chip"
@@ -95,6 +95,7 @@ const catalog = useCatalogStore();
 
 const query = ref(String(route.query.q ?? ''));
 const categoryId = computed(() => (route.params.categoryId as string | undefined) || undefined);
+const levelCategories = computed(() => catalog.categoriesAt(categoryId.value));
 const filtersOpen = ref(false);
 const sort = ref<CatalogSort>('popular');
 const filters = reactive<CatalogFilters>({
@@ -180,6 +181,7 @@ function onResetFilters() {
 <style scoped lang="scss">
 .catalog-page__top {
   padding: 12px 16px 8px;
+  padding-top: calc(12px + var(--safe-area-inset-top, env(safe-area-inset-top, 0px)));
   background: #fff;
   position: sticky;
   top: 0;
