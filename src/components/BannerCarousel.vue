@@ -36,8 +36,8 @@ const router = useRouter();
 const slide = ref(props.banners[0]?.id ?? '');
 
 function open(banner: Banner) {
-  if (banner.categoryId) {
-    void router.push({ name: 'catalog', params: { categoryId: banner.categoryId } });
+  if (banner.collectionId) {
+    void router.push({ name: 'catalog', params: { collectionId: banner.collectionId } });
   } else {
     void router.push({ name: 'catalog' });
   }

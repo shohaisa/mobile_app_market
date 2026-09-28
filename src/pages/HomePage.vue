@@ -37,19 +37,21 @@
       </template>
 
       <template v-else>
-        <CategoryGrid :categories="catalog.categories" @select="openCategory" />
+        <CollectionGrid :collections="catalog.collections" @select="openCollection" />
 
-        <div class="section-title">
-          Скидки дня
-          <q-btn flat dense no-caps color="primary" label="Все" @click="openCatalog" />
-        </div>
-        <div class="product-grid">
-          <ProductCard v-for="product in catalog.deals.slice(0, 6)" :key="product.id" :product="product" />
-        </div>
+        <template v-if="catalog.deals.length">
+          <div class="section-title">
+            Скидки дня
+            <q-btn flat dense no-caps color="primary" label="Все" @click="openCatalog" />
+          </div>
+          <div class="product-grid">
+            <ProductCard v-for="product in catalog.deals.slice(0, 6)" :key="product.id" :product="product" />
+          </div>
+        </template>
 
-        <div class="section-title">Хиты продаж</div>
+        <div class="section-title">Товары</div>
         <div class="product-grid">
-          <ProductCard v-for="product in catalog.hits" :key="product.id" :product="product" />
+          <ProductCard v-for="product in catalog.homeProducts" :key="product.id" :product="product" />
         </div>
       </template>
     </div>
@@ -59,7 +61,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import CategoryGrid from '@/components/CategoryGrid.vue';
+import CollectionGrid from '@/components/CollectionGrid.vue';
 import ProductCard from '@/components/ProductCard.vue';
 import { useCatalogStore } from '@/stores/catalog';
 import { useUserStore } from '@/stores/user';
@@ -75,8 +77,8 @@ function openCatalog() {
   void router.push({ name: 'catalog' });
 }
 
-function openCategory(id: string) {
-  void router.push({ name: 'catalog', params: { categoryId: id } });
+function openCollection(id: string) {
+  void router.push({ name: 'catalog', params: { collectionId: id } });
 }
 
 function goSearch() {

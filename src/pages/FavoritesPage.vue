@@ -4,7 +4,10 @@
       <div class="text-h6 text-weight-bold">Избранное</div>
     </div>
     <div class="page-pad">
-      <div v-if="products.length" class="product-grid">
+      <div v-if="loading" class="empty-state">
+        <q-spinner color="primary" size="32px" />
+      </div>
+      <div v-else-if="products.length" class="product-grid">
         <ProductCard v-for="product in products" :key="product.id" :product="product" />
       </div>
       <div v-else class="empty-state">
@@ -17,16 +20,44 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, watch } from 'vue';
 import ProductCard from '@/components/ProductCard.vue';
 import { useCatalogStore } from '@/stores/catalog';
 import { useFavoritesStore } from '@/stores/favorites';
+import type { Product } from '@/types/marketplace';
 
 const catalog = useCatalogStore();
 const favorites = useFavoritesStore();
+const products = ref<Product[]>([]);
+const loading = ref(false);
+let request = 0;
 
-const products = computed(() =>
-  catalog.products.filter((item) => favorites.ids.includes(item.id)),
+watch(
+  () => favorites.ids,
+  async (ids) => {
+    const current = ++request;
+    loading.value = true;
+    try {
+      const loaded = await Promise.all(
+        ids.map(async (id) => {
+          try {
+            return await catalog.loadProduct(id);
+          } catch {
+            return catalog.productById(id) ?? null;
+          }
+        }),
+      );
+      if (current !== request) {
+        return;
+      }
+      products.value = loaded.filter((item): item is Product => item !== null);
+    } finally {
+      if (current === request) {
+        loading.value = false;
+      }
+    }
+  },
+  { immediate: true },
 );
 </script>
 

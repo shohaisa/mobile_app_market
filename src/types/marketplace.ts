@@ -1,8 +1,8 @@
-export interface Category {
+export interface Collection {
   id: string;
   title: string;
   parentId: string | null;
-  children: Category[];
+  children: Collection[];
   icon: string;
   color: string;
 }
@@ -12,7 +12,7 @@ export interface Banner {
   title: string;
   subtitle: string;
   image: string;
-  categoryId?: string | undefined;
+  collectionId?: string | undefined;
 }
 
 export interface Review {
@@ -26,7 +26,7 @@ export interface Review {
 export interface Seller {
   id: string;
   name: string;
-  rating: number;
+  rating?: number;
 }
 
 export interface ProductVariant {
@@ -38,14 +38,15 @@ export interface Product {
   id: string;
   title: string;
   description: string;
-  categoryId: string;
+  collectionId: string;
   images: string[];
   price: number;
   oldPrice?: number | undefined;
   rating: number;
   reviewCount: number;
   soldCount: number;
-  seller: Seller;
+  seller: Seller | null;
+  stock?: number | undefined;
   variants?: ProductVariant[] | undefined;
   inStock: boolean;
   tags?: string[] | undefined;
@@ -106,12 +107,7 @@ export interface Order {
   total: number;
 }
 
-export type CatalogSort = 'popular' | 'priceAsc' | 'priceDesc' | 'rating';
-
 export interface CatalogFilters {
   minPrice: number | null;
   maxPrice: number | null;
-  minRating: number;
-  onlyDiscount: boolean;
-  inStockOnly: boolean;
 }

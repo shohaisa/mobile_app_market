@@ -22,6 +22,7 @@
           @click="onFav"
         />
         <q-carousel
+          v-if="product.images.length"
           v-model="slide"
           animated
           swipeable
@@ -37,19 +38,20 @@
             :img-src="image"
           />
         </q-carousel>
+        <div v-else class="product-page__placeholder">Нет фото</div>
         <div v-if="sale" class="badge-sale">-{{ sale }}%</div>
       </div>
 
       <div class="page-pad">
-        <div class="row items-center q-gutter-sm muted text-caption">
-          <span>
-            <q-icon name="star" color="warning" />
-            {{ product.rating.toFixed(1) }} · {{ product.reviewCount }} отзывов
-          </span>
-          <span>{{ product.soldCount }} купили</span>
+        <div class="muted text-caption">
+          <q-icon name="star" color="warning" />
+          {{ product.rating.toFixed(1) }} · {{ product.reviewCount }} отзывов
         </div>
         <h1 class="product-page__title">{{ product.title }}</h1>
         <PriceBlock :price="product.price" :old-price="product.oldPrice" size="lg" />
+        <div v-if="product.stock != null" class="muted text-caption q-mt-xs">
+          В наличии: {{ product.stock }}
+        </div>
 
         <div v-for="variant in product.variants" :key="variant.name" class="q-mt-md">
           <div class="text-caption text-weight-medium q-mb-xs">{{ variant.name }}</div>
@@ -68,9 +70,8 @@
           </div>
         </div>
 
-        <div class="card-soft q-pa-md q-mt-md">
-          <div class="text-weight-bold q-mb-xs">{{ product.seller.name }}</div>
-          <div class="muted text-caption">Рейтинг продавца {{ product.seller.rating.toFixed(1) }}</div>
+        <div v-if="product.seller" class="card-soft q-pa-md q-mt-md">
+          <div class="text-weight-bold">{{ product.seller.name }}</div>
         </div>
 
         <div class="q-mt-lg">
@@ -102,8 +103,18 @@
     </div>
 
     <div v-else class="empty-state">
-      <q-spinner color="primary" size="32px" />
-      <div class="q-mt-md">Загрузка товара…</div>
+      <q-btn flat round icon="arrow_back" color="dark" class="q-mb-md" @click="router.back()" />
+      <template v-if="missing">
+        <q-icon name="search_off" size="48px" />
+        <div class="q-mt-md">Товар не найден</div>
+      </template>
+      <template v-else-if="failed">
+        <div>Не удалось загрузить товар</div>
+      </template>
+      <template v-else>
+        <q-spinner color="primary" size="32px" />
+        <div class="q-mt-md">Загрузка товара…</div>
+      </template>
     </div>
   </q-page>
 </template>
@@ -128,6 +139,8 @@ const cart = useCartStore();
 const favorites = useFavoritesStore();
 const slide = ref(0);
 const selected = reactive<Record<string, string>>({});
+const missing = ref(false);
+const failed = ref(false);
 
 const product = computed(() => catalog.productById(String(route.params.id)));
 const sale = computed(() =>
@@ -146,6 +159,28 @@ const inCart = computed(() =>
       item.productId === product.value?.id &&
       (item.variant ?? '') === (variantLabel.value || ''),
   ),
+);
+
+watch(
+  () => String(route.params.id),
+  (id) => {
+    missing.value = false;
+    failed.value = false;
+    void catalog.loadProduct(id).then(
+      (value) => {
+        if (String(route.params.id) !== id) {
+          return;
+        }
+        missing.value = value === null;
+      },
+      () => {
+        if (String(route.params.id) === id) {
+          failed.value = true;
+        }
+      },
+    );
+  },
+  { immediate: true },
 );
 
 watch(
@@ -205,5 +240,14 @@ async function addToCart() {
   line-height: 1.25;
   font-weight: 800;
   margin: 8px 0 10px;
+}
+
+.product-page__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 360px;
+  background: #eef0f5;
+  color: #8b90a0;
 }
 </style>

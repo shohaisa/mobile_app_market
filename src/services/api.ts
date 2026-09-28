@@ -5,7 +5,6 @@ import {
   deliveryOptions,
   initialOrders,
   paymentOptions,
-  products,
 } from '@/mock/data';
 import type {
   Address,
@@ -13,7 +12,6 @@ import type {
   DeliveryOption,
   Order,
   PaymentOption,
-  Product,
   User,
 } from '@/types/marketplace';
 
@@ -27,16 +25,6 @@ export const api = {
   async getBanners(): Promise<Banner[]> {
     await wait();
     return banners;
-  },
-
-  async getProducts(): Promise<Product[]> {
-    await wait();
-    return products;
-  },
-
-  async getProduct(id: string): Promise<Product | undefined> {
-    await wait();
-    return products.find((item) => item.id === id);
   },
 
   async getUser(): Promise<User> {
