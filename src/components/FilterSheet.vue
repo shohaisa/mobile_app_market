@@ -16,12 +16,6 @@
         </div>
       </div>
 
-      <div class="text-caption text-weight-medium q-mb-xs">Рейтинг от</div>
-      <q-rating v-model="draft.minRating" size="28px" color="warning" class="q-mb-md" />
-
-      <q-toggle v-model="draft.onlyDiscount" label="Только со скидкой" color="accent" />
-      <q-toggle v-model="draft.inStockOnly" label="В наличии" color="primary" class="q-mb-md" />
-
       <q-btn
         unelevated
         color="primary"

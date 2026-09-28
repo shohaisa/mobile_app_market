@@ -1,24 +1,24 @@
 <template>
   <div class="category-grid">
     <button
-      v-for="category in categories"
-      :key="category.id"
+      v-for="collection in collections"
+      :key="collection.id"
       type="button"
       class="category-grid__item"
-      @click="$emit('select', category.id)"
+      @click="$emit('select', collection.id)"
     >
-      <div class="category-grid__icon" :style="{ background: `${category.color}18`, color: category.color }">
-        <q-icon :name="category.icon" size="22px" />
+      <div class="category-grid__icon" :style="{ background: `${collection.color}18`, color: collection.color }">
+        <q-icon :name="collection.icon" size="22px" />
       </div>
-      <span>{{ category.title }}</span>
+      <span>{{ collection.title }}</span>
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { Category } from '@/types/marketplace';
+import type { Collection } from '@/types/marketplace';
 
-defineProps<{ categories: Category[] }>();
+defineProps<{ collections: Collection[] }>();
 defineEmits<{ select: [id: string] }>();
 </script>
 

@@ -1,16 +1,16 @@
 import { apiRequest } from '@/services/http';
-import type { Category } from '@/types/marketplace';
+import type { Collection } from '@/types/marketplace';
 
-interface CategoryNode {
+interface CollectionNode {
   id: number;
   name: string;
   parent_id: number | null;
-  children: CategoryNode[];
+  children: CollectionNode[];
 }
 
-interface CategoriesResponse {
+interface CollectionsResponse {
   status_code: number;
-  data: CategoryNode[];
+  data: CollectionNode[];
 }
 
 const styles: { icon: string; color: string }[] = [
@@ -24,7 +24,7 @@ const styles: { icon: string; color: string }[] = [
   { icon: 'menu_book', color: '#ca8a04' },
 ];
 
-function mapNode(node: CategoryNode, index: number): Category {
+function mapNode(node: CollectionNode, index: number): Collection {
   const style = styles[index % styles.length] ?? styles[0];
 
   return {
@@ -37,8 +37,8 @@ function mapNode(node: CategoryNode, index: number): Category {
   };
 }
 
-export async function fetchCategories(): Promise<Category[]> {
-  const response = await apiRequest<CategoriesResponse>('/v1/categories');
+export async function fetchCollections(): Promise<Collection[]> {
+  const response = await apiRequest<CollectionsResponse>('/v1/collections');
 
   return response.data.map(mapNode);
 }

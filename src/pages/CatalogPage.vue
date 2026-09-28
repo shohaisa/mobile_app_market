@@ -19,57 +19,53 @@
         <button
           type="button"
           class="cat-chip"
-          :class="{ 'cat-chip--active': !categoryId }"
-          @click="selectCategory(undefined)"
+          :class="{ 'cat-chip--active': !collectionId }"
+          @click="selectCollection(undefined)"
         >
           Все
         </button>
         <button
-          v-for="category in levelCategories"
-          :key="category.id"
+          v-for="collection in levelCollections"
+          :key="collection.id"
           type="button"
           class="cat-chip"
-          :class="{ 'cat-chip--active': categoryId === category.id }"
-          @click="selectCategory(category.id)"
+          :class="{ 'cat-chip--active': collectionId === collection.id }"
+          @click="selectCollection(collection.id)"
         >
-          {{ category.title }}
+          {{ collection.title }}
         </button>
       </div>
 
-      <div class="row items-center justify-between q-mt-sm">
-        <q-btn-dropdown
-          flat
-          dense
-          no-caps
-          color="dark"
-          :label="sortLabel"
-          icon="swap_vert"
-        >
-          <q-list>
-            <q-item
-              v-for="option in sortOptions"
-              :key="option.value"
-              v-close-popup
-              clickable
-              @click="sort = option.value"
-            >
-              <q-item-section>{{ option.label }}</q-item-section>
-            </q-item>
-          </q-list>
-        </q-btn-dropdown>
+      <div class="row items-center justify-end q-mt-sm">
         <q-btn flat dense no-caps color="dark" icon="tune" label="Фильтры" @click="filtersOpen = true" />
       </div>
     </div>
 
     <div class="page-pad">
-      <div class="text-caption muted q-mb-sm">{{ visible.length }} товаров</div>
-      <div v-if="visible.length" class="product-grid">
-        <ProductCard v-for="product in visible" :key="product.id" :product="product" />
+      <div class="text-caption muted q-mb-sm">{{ productCount }}</div>
+      <div v-if="catalog.listingLoading && !catalog.products.length" class="empty-state">
+        <q-spinner color="primary" size="32px" />
+      </div>
+      <div v-else-if="catalog.listingFailed" class="empty-state">
+        <div>Не удалось загрузить товары</div>
+      </div>
+      <div v-else-if="catalog.products.length" class="product-grid">
+        <ProductCard v-for="product in catalog.products" :key="product.id" :product="product" />
       </div>
       <div v-else class="empty-state">
         <q-icon name="search_off" size="48px" />
         <div>Ничего не нашли. Попробуйте другой запрос.</div>
       </div>
+      <q-btn
+        v-if="catalog.listingHasMore"
+        class="full-width q-mt-md"
+        outline
+        color="primary"
+        no-caps
+        label="Показать ещё"
+        :loading="catalog.listingLoading"
+        @click="catalog.loadMore()"
+      />
     </div>
 
     <FilterSheet
@@ -86,35 +82,25 @@ import { computed, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import FilterSheet from '@/components/FilterSheet.vue';
 import ProductCard from '@/components/ProductCard.vue';
+import { plural } from '@/composables/useMoney';
 import { useCatalogStore } from '@/stores/catalog';
-import type { CatalogFilters, CatalogSort } from '@/types/marketplace';
+import type { CatalogFilters } from '@/types/marketplace';
 
 const route = useRoute();
 const router = useRouter();
 const catalog = useCatalogStore();
 
 const query = ref(String(route.query.q ?? ''));
-const categoryId = computed(() => (route.params.categoryId as string | undefined) || undefined);
-const levelCategories = computed(() => catalog.categoriesAt(categoryId.value));
+const collectionId = computed(() => (route.params.collectionId as string | undefined) || undefined);
+const levelCollections = computed(() => catalog.collectionsAt(collectionId.value));
 const filtersOpen = ref(false);
-const sort = ref<CatalogSort>('popular');
 const filters = reactive<CatalogFilters>({
   minPrice: null,
   maxPrice: null,
-  minRating: 0,
-  onlyDiscount: false,
-  inStockOnly: false,
 });
 
-const sortOptions: { value: CatalogSort; label: string }[] = [
-  { value: 'popular', label: 'Популярные' },
-  { value: 'priceAsc', label: 'Дешевле' },
-  { value: 'priceDesc', label: 'Дороже' },
-  { value: 'rating', label: 'С высоким рейтингом' },
-];
-
-const sortLabel = computed(
-  () => sortOptions.find((item) => item.value === sort.value)?.label ?? 'Сортировка',
+const productCount = computed(() =>
+  plural(catalog.listingTotal, 'товар', 'товара', 'товаров'),
 );
 
 watch(
@@ -124,40 +110,23 @@ watch(
   },
 );
 
-const visible = computed(() => {
-  let list = catalog.search(query.value);
-  if (categoryId.value) {
-    list = list.filter((item) => item.categoryId === categoryId.value);
-  }
-  if (filters.minPrice != null && filters.minPrice !== 0) {
-    list = list.filter((item) => item.price >= Number(filters.minPrice));
-  }
-  if (filters.maxPrice != null && filters.maxPrice !== 0) {
-    list = list.filter((item) => item.price <= Number(filters.maxPrice));
-  }
-  if (filters.minRating) {
-    list = list.filter((item) => item.rating >= filters.minRating);
-  }
-  if (filters.onlyDiscount) {
-    list = list.filter((item) => Boolean(item.oldPrice && item.oldPrice > item.price));
-  }
-  if (filters.inStockOnly) {
-    list = list.filter((item) => item.inStock);
-  }
-  const copy = [...list];
-  copy.sort((a, b) => {
-    if (sort.value === 'priceAsc') return a.price - b.price;
-    if (sort.value === 'priceDesc') return b.price - a.price;
-    if (sort.value === 'rating') return b.rating - a.rating;
-    return b.soldCount - a.soldCount;
-  });
-  return copy;
-});
+watch(
+  () => [query.value, collectionId.value, filters.minPrice, filters.maxPrice] as const,
+  () => {
+    void catalog.loadListing({
+      q: query.value,
+      collectionId: collectionId.value,
+      minPrice: filters.minPrice,
+      maxPrice: filters.maxPrice,
+    });
+  },
+  { immediate: true },
+);
 
-function selectCategory(id?: string) {
+function selectCollection(id?: string) {
   void router.push({
     name: 'catalog',
-    params: { categoryId: id ?? '' },
+    params: { collectionId: id ?? '' },
     query: query.value ? { q: query.value } : {},
   });
 }
@@ -171,9 +140,6 @@ function onResetFilters() {
   Object.assign(filters, {
     minPrice: null,
     maxPrice: null,
-    minRating: 0,
-    onlyDiscount: false,
-    inStockOnly: false,
   });
 }
 </script>
