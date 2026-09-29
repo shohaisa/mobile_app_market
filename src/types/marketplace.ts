@@ -73,8 +73,9 @@ export interface Address {
 
 export interface User {
   name: string;
-  email: string;
+  email: string | null;
   phone: string;
+  address: string;
 }
 
 export type OrderStatus = 'processing' | 'shipping' | 'delivered' | 'cancelled';

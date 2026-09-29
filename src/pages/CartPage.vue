@@ -54,29 +54,46 @@
         </div>
       </div>
 
+      <div v-if="!canOrder" class="text-caption q-mt-md">
+        {{ profileHint }}
+      </div>
       <q-btn
         unelevated
         color="primary"
-        class="full-width q-mt-md"
+        class="full-width q-mt-sm"
         no-caps
         size="lg"
-        label="Оформить заказ"
-        :to="{ name: 'checkout' }"
+        :label="canOrder ? 'Оформить заказ' : 'Заполнить профиль'"
+        @click="goCheckout"
       />
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import PriceBlock from '@/components/PriceBlock.vue';
 import QtyStepper from '@/components/QtyStepper.vue';
 import { formatMoney, plural } from '@/composables/useMoney';
 import { useCartStore } from '@/stores/cart';
+import { useUserStore } from '@/stores/user';
 import type { CartItem } from '@/types/marketplace';
 
+const router = useRouter();
 const cart = useCartStore();
+const user = useUserStore();
 const promo = ref(cart.promoCode);
+const canOrder = computed(() => Boolean(user.token) && user.profileComplete);
+const profileHint = computed(() =>
+  user.token
+    ? 'Чтобы оформить заказ, укажите телефон и адрес в профиле.'
+    : 'Чтобы оформить заказ, войдите и укажите телефон и адрес.',
+);
+
+function goCheckout(): void {
+  void router.push({ name: canOrder.value ? 'checkout' : 'profile' });
+}
 
 async function onQty(item: CartItem, qty: number) {
   await cart.setQty(item.productId, qty, item.variant);

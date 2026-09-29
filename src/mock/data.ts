@@ -411,6 +411,7 @@ export const currentUser: User = {
   name: 'Анна Смирнова',
   email: 'anna.smirnova@example.com',
   phone: '+7 900 123-45-67',
+  address: '',
 };
 
 export const addresses: Address[] = [

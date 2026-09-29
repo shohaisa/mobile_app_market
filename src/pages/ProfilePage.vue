@@ -12,15 +12,45 @@
         <div class="col">
           <div class="text-subtitle1 text-weight-bold">{{ user.user.name }}</div>
           <div v-if="user.user.phone" class="muted text-caption">{{ user.user.phone }}</div>
-          <div class="muted text-caption">{{ user.user.email }}</div>
+          <div v-if="user.user.email" class="muted text-caption">{{ user.user.email }}</div>
         </div>
-        <q-btn flat dense color="primary" label="Выйти" @click="user.signOut()" />
+        <q-btn flat dense color="primary" label="Выйти" :loading="signingOut" @click="submitSignOut" />
+      </div>
+
+      <div v-if="user.user" class="card-soft q-pa-md q-mt-md">
+        <div class="text-subtitle1 text-weight-bold">Телефон и адрес</div>
+        <div class="muted text-caption q-mb-md">
+          Без них заказ оформить нельзя. Адрес — одна строка, например «Ош Курманжан-датка 235 рядом сити маркет».
+        </div>
+        <q-input v-model="phone" outlined label="Телефон" maxlength="32" />
+        <q-input
+          v-model="address"
+          class="q-mt-sm"
+          outlined
+          autogrow
+          type="textarea"
+          label="Адрес"
+          maxlength="255"
+        />
+        <q-btn
+          class="full-width q-mt-md"
+          color="primary"
+          unelevated
+          no-caps
+          label="Сохранить"
+          :loading="saving"
+          @click="saveContact"
+        />
+        <div v-if="saveError" class="text-negative text-caption q-mt-sm">{{ saveError }}</div>
+        <div v-else-if="!user.profileComplete" class="text-caption q-mt-sm text-warning">
+          Заполните оба поля, чтобы открыть оформление заказа.
+        </div>
       </div>
 
       <div v-else class="card-soft q-pa-md">
-        <div class="text-subtitle1 text-weight-bold">Войдите, чтобы видеть заказы</div>
+        <div class="text-subtitle1 text-weight-bold">Войдите, чтобы оформить заказ</div>
         <div class="muted text-caption q-mb-md">
-          Войдите через Google, чтобы сервер выдал токен сессии.
+          Войдите через Google или Apple, затем укажите телефон и адрес.
         </div>
         <q-btn
           class="full-width q-mb-sm"
@@ -58,7 +88,7 @@
         <q-item>
           <q-item-section avatar><q-icon name="location_on" color="positive" /></q-item-section>
           <q-item-section>
-            <q-item-label>Адреса</q-item-label>
+            <q-item-label>Адрес</q-item-label>
             <q-item-label caption>{{ addressLine }}</q-item-label>
           </q-item-section>
         </q-item>
@@ -98,7 +128,7 @@
 
 <script setup lang="ts">
 import { Capacitor } from '@capacitor/core';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { plural } from '@/composables/useMoney';
 import { ErrorCode } from '@capawesome/capacitor-google-sign-in';
 import { ApiError } from '@/services/http';
@@ -112,10 +142,52 @@ const orders = useOrdersStore();
 const notify = ref(true);
 const authError = ref('');
 const authBusy = ref(false);
+const saving = ref(false);
+const signingOut = ref(false);
+const saveError = ref('');
+const phone = ref('');
+const address = ref('');
 const appleOpen = ref(false);
 const appleToken = ref('');
 const appleName = ref('');
 const appleNonce = ref('');
+
+watch(
+  () => user.user,
+  (profile) => {
+    phone.value = profile?.phone ?? '';
+    address.value = profile?.address ?? '';
+  },
+  { immediate: true },
+);
+
+async function saveContact(): Promise<void> {
+  const nextPhone = phone.value.trim();
+  const nextAddress = address.value.trim();
+  if (nextPhone === '' || nextAddress === '') {
+    saveError.value = 'Укажите телефон и адрес';
+    return;
+  }
+
+  saving.value = true;
+  saveError.value = '';
+  try {
+    await user.saveProfile({ phone: nextPhone, address: nextAddress });
+  } catch (error) {
+    saveError.value = error instanceof ApiError ? error.message : 'Не удалось сохранить профиль';
+  } finally {
+    saving.value = false;
+  }
+}
+
+async function submitSignOut(): Promise<void> {
+  signingOut.value = true;
+  try {
+    await user.signOut();
+  } finally {
+    signingOut.value = false;
+  }
+}
 
 function openApple(): void {
   authError.value = '';
@@ -173,11 +245,7 @@ const initials = computed(() => {
     .toUpperCase();
 });
 
-const addressLine = computed(() => {
-  const address = user.addresses[0];
-  if (!address) return 'Не указан';
-  return `${address.city}, ${address.street}`;
-});
+const addressLine = computed(() => user.user?.address || 'Не указан');
 
 const orderCaption = computed(() =>
   plural(orders.orders.length, 'заказ', 'заказа', 'заказов'),

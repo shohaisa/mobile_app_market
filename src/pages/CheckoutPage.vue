@@ -14,22 +14,21 @@
 
     <div v-else class="page-pad">
       <div class="text-subtitle1 text-weight-bold q-mb-sm">Адрес</div>
-      <q-list class="card-soft">
-        <q-item
-          v-for="address in user.addresses"
-          :key="address.id"
-          tag="label"
-          clickable
-        >
-          <q-item-section avatar>
-            <q-radio v-model="user.selectedAddressId" :val="address.id" color="primary" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>{{ address.city }}, {{ address.street }}</q-item-label>
-            <q-item-label caption>{{ address.apartment }} {{ address.comment }}</q-item-label>
-          </q-item-section>
-        </q-item>
-      </q-list>
+      <div v-if="!canOrder" class="card-soft q-pa-md">
+        <div class="text-body2">{{ profileHint }}</div>
+        <q-btn
+          class="q-mt-md"
+          unelevated
+          color="primary"
+          no-caps
+          label="Заполнить профиль"
+          :to="{ name: 'profile' }"
+        />
+      </div>
+      <div v-else class="card-soft q-pa-md">
+        <div>{{ user.user?.address }}</div>
+        <div v-if="user.user?.phone" class="muted text-caption q-mt-xs">{{ user.user.phone }}</div>
+      </div>
 
       <div class="text-subtitle1 text-weight-bold q-mt-lg q-mb-sm">Доставка</div>
       <q-list class="card-soft">
@@ -83,6 +82,7 @@
         no-caps
         size="lg"
         :loading="submitting"
+        :disable="!canOrder"
         label="Подтвердить заказ"
         @click="submit"
       />
@@ -126,11 +126,20 @@ const payment = computed(
 );
 const deliveryPrice = computed(() => delivery.value?.price ?? 0);
 const payTotal = computed(() => cart.total + deliveryPrice.value);
+const canOrder = computed(() => Boolean(user.token) && user.profileComplete);
+const profileHint = computed(() =>
+  user.token
+    ? 'Укажите телефон и адрес в профиле, чтобы оформить заказ.'
+    : 'Войдите и укажите телефон и адрес, чтобы оформить заказ.',
+);
 
 async function submit() {
   const address = user.selectedAddress();
-  if (!address || !delivery.value || !payment.value) {
-    $q.notify({ type: 'negative', message: 'Выберите адрес, доставку и оплату' });
+  if (!canOrder.value || !address || !delivery.value || !payment.value) {
+    $q.notify({
+      type: 'negative',
+      message: 'Нужны телефон и адрес в профиле, а также доставка и оплата',
+    });
     return;
   }
   submitting.value = true;

@@ -25,7 +25,7 @@
         <div class="text-weight-bold q-mb-xs">Доставка</div>
         <div>{{ order.delivery.title }} · {{ formatMoney(order.deliveryPrice) }}</div>
         <div class="muted q-mt-sm">
-          {{ order.address.city }}, {{ order.address.street
+          {{ order.address.city ? `${order.address.city}, ` : '' }}{{ order.address.street
           }}<span v-if="order.address.apartment">, {{ order.address.apartment }}</span>
         </div>
       </div>

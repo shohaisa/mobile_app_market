@@ -71,7 +71,7 @@ const catalog = useCatalogStore();
 const user = useUserStore();
 const query = ref('');
 
-const city = computed(() => user.addresses[0]?.city ?? 'Москва');
+const city = computed(() => user.user?.address || 'укажите адрес');
 
 function openCatalog() {
   void router.push({ name: 'catalog' });

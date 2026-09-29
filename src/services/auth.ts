@@ -7,7 +7,7 @@ export interface AuthSession {
   token: string;
   user_id: number;
   name: string;
-  email: string;
+  email: string | null;
 }
 
 interface AuthResponse {
@@ -18,7 +18,15 @@ interface AuthResponse {
 export interface Profile {
   user_id: number;
   name: string;
-  email: string;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  profile_complete: boolean;
+}
+
+export interface ProfileUpdate {
+  phone?: string;
+  address?: string;
 }
 
 interface ProfileResponse {
@@ -63,4 +71,17 @@ export async function loginWithApple(
 export async function fetchCurrentUser(token: string): Promise<Profile> {
   const response = await apiRequest<ProfileResponse>('/v1/user', { token });
   return response.data;
+}
+
+export async function updateCurrentUser(token: string, attributes: ProfileUpdate): Promise<Profile> {
+  const response = await apiRequest<ProfileResponse>('/v1/user', {
+    method: 'PATCH',
+    token,
+    body: attributes,
+  });
+  return response.data;
+}
+
+export async function logout(token: string): Promise<void> {
+  await apiRequest('/v1/logout', { method: 'POST', token });
 }
