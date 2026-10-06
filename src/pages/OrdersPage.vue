@@ -18,14 +18,16 @@
         </div>
         <div class="text-caption muted q-my-xs">{{ formatDate(order.createdAt) }}</div>
         <div class="row q-gutter-xs q-mb-sm">
-          <q-img
-            v-for="item in order.items.slice(0, 4)"
-            :key="item.productId + (item.variant ?? '')"
-            :src="item.image"
-            width="44px"
-            height="44px"
-            class="rounded-borders"
-          />
+          <template v-for="item in order.items.slice(0, 4)" :key="item.productId + (item.variant ?? '')">
+            <q-img
+              v-if="item.image"
+              :src="item.image"
+              width="44px"
+              height="44px"
+              class="rounded-borders"
+            />
+            <div v-else class="order-thumb rounded-borders">Нет фото</div>
+          </template>
         </div>
         <div class="row justify-between text-weight-medium">
           <span>{{ order.items.reduce((sum, item) => sum + item.qty, 0) }} тов.</span>
@@ -81,5 +83,18 @@ function formatDate(value: string): string {
   padding-top: calc(8px + var(--safe-area-inset-top, env(safe-area-inset-top, 0px)));
   background: #fff;
   gap: 4px;
+}
+
+.order-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: #eef0f5;
+  color: #8b90a0;
+  font-size: 8px;
+  line-height: 1.1;
+  text-align: center;
 }
 </style>

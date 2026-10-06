@@ -5,8 +5,10 @@ export class ApiError extends Error {
   constructor(
     message: string,
     readonly status: number,
+    readonly errors: Record<string, string[]> = {},
   ) {
     super(message);
+    this.name = 'ApiError';
   }
 }
 
@@ -18,8 +20,9 @@ export async function apiRequest<T>(
     token?: string | null;
   } = {},
 ): Promise<T> {
+  const form = options.body instanceof FormData ? options.body : null;
   const headers = new Headers({ Accept: 'application/json' });
-  if (options.body !== undefined) {
+  if (options.body !== undefined && !form) {
     headers.set('Content-Type', 'application/json');
   }
   if (options.token) {
@@ -30,7 +33,9 @@ export async function apiRequest<T>(
     method: options.method ?? 'GET',
     headers,
   };
-  if (options.body !== undefined) {
+  if (form) {
+    init.body = form;
+  } else if (options.body !== undefined) {
     init.body = JSON.stringify(options.body);
   }
 
@@ -42,7 +47,7 @@ export async function apiRequest<T>(
 
   if (!response.ok) {
     const validation = payload?.errors ? Object.values(payload.errors).flat()[0] : undefined;
-    throw new ApiError(validation ?? payload?.message ?? 'Запрос не выполнен', response.status);
+    throw new ApiError(validation ?? payload?.message ?? 'Запрос не выполнен', response.status, payload?.errors ?? {});
   }
 
   return payload as T;

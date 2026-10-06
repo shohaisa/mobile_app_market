@@ -14,7 +14,8 @@
 
     <div v-else class="page-pad">
       <div v-for="item in cart.items" :key="item.productId + (item.variant ?? '')" class="cart-item card-soft q-pa-sm q-mb-sm">
-        <q-img :src="item.image" width="84px" height="84px" class="rounded-borders" />
+        <q-img v-if="item.image" :src="item.image" width="84px" height="84px" class="rounded-borders" />
+        <div v-else class="cart-item__placeholder rounded-borders">Нет фото</div>
         <div class="cart-item__body">
           <div class="line-clamp-2 text-weight-medium">{{ item.title }}</div>
           <div v-if="item.variant" class="text-caption muted">{{ item.variant }}</div>
@@ -119,5 +120,17 @@ async function applyPromo() {
 
 .cart-item__body {
   min-width: 0;
+}
+
+.cart-item__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 84px;
+  height: 84px;
+  background: #eef0f5;
+  color: #8b90a0;
+  font-size: 11px;
+  text-align: center;
 }
 </style>
