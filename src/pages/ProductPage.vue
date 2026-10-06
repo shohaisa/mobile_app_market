@@ -22,7 +22,7 @@
           @click="onFav"
         />
         <q-carousel
-          v-if="product.images.length"
+          v-if="gallery.length"
           v-model="slide"
           animated
           swipeable
@@ -32,8 +32,8 @@
           height="360px"
         >
           <q-carousel-slide
-            v-for="(image, index) in product.images"
-            :key="image"
+            v-for="(image, index) in gallery"
+            :key="`${index}-${image}`"
             :name="index"
             :img-src="image"
           />
@@ -127,6 +127,7 @@ import PriceBlock from '@/components/PriceBlock.vue';
 import StickyCartBar from '@/components/StickyCartBar.vue';
 import { hapticLight } from '@/composables/useHaptics';
 import { discountPercent } from '@/composables/useMoney';
+import { photoUrl } from '@/services/products';
 import { useCartStore } from '@/stores/cart';
 import { useCatalogStore } from '@/stores/catalog';
 import { useFavoritesStore } from '@/stores/favorites';
@@ -143,6 +144,11 @@ const missing = ref(false);
 const failed = ref(false);
 
 const product = computed(() => catalog.productById(String(route.params.id)));
+const gallery = computed(() =>
+  (product.value?.photos ?? [])
+    .map((photo) => photoUrl(photo, 'master'))
+    .filter((src): src is string => src !== null),
+);
 const sale = computed(() =>
   product.value ? discountPercent(product.value.price, product.value.oldPrice) : null,
 );

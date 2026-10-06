@@ -12,7 +12,8 @@
 
       <div class="card-soft q-pa-md q-mb-sm" v-for="item in order.items" :key="item.productId + (item.variant ?? '')">
         <div class="row no-wrap q-gutter-sm">
-          <q-img :src="item.image" width="72px" height="72px" class="rounded-borders" />
+          <q-img v-if="item.image" :src="item.image" width="72px" height="72px" class="rounded-borders" />
+          <div v-else class="order-item__placeholder rounded-borders">Нет фото</div>
           <div class="col">
             <div class="text-weight-medium">{{ item.title }}</div>
             <div v-if="item.variant" class="text-caption muted">{{ item.variant }}</div>
@@ -87,5 +88,18 @@ function statusColor(status: OrderStatus): string {
   padding-top: calc(8px + var(--safe-area-inset-top, env(safe-area-inset-top, 0px)));
   background: #fff;
   gap: 4px;
+}
+
+.order-item__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
+  background: #eef0f5;
+  color: #8b90a0;
+  font-size: 11px;
+  text-align: center;
 }
 </style>

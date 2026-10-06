@@ -1,5 +1,6 @@
 import { defineStore, acceptHMRUpdate } from 'pinia';
 import { computed, ref } from 'vue';
+import { photoUrl, primaryPhoto } from '@/services/products';
 import { getJson, setJson } from '@/services/storage';
 import type { CartItem, Product } from '@/types/marketplace';
 
@@ -69,7 +70,7 @@ export const useCartStore = defineStore('cart', () => {
       items.value.push({
         productId: product.id,
         title: product.title,
-        image: product.images[0] ?? '',
+        image: photoUrl(primaryPhoto(product.photos), 'small') ?? '',
         price: product.price,
         oldPrice: product.oldPrice,
         qty,

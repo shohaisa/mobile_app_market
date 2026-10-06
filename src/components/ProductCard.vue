@@ -8,11 +8,12 @@
     @keyup.enter="open"
   >
     <div class="product-card__media">
-      <q-img :src="product.images[0] ?? ''" ratio="1" spinner-color="primary" class="rounded-borders">
+      <q-img v-if="cover" :src="cover" ratio="1" spinner-color="primary" class="rounded-borders">
         <template #error>
           <div class="absolute-full flex flex-center bg-grey-3 text-grey-6">Нет фото</div>
         </template>
       </q-img>
+      <div v-else class="product-card__placeholder">Нет фото</div>
       <div v-if="sale" class="badge-sale">-{{ sale }}%</div>
       <q-btn
         class="product-card__fav"
@@ -42,6 +43,7 @@ import { useRouter } from 'vue-router';
 import PriceBlock from '@/components/PriceBlock.vue';
 import { hapticLight } from '@/composables/useHaptics';
 import { discountPercent } from '@/composables/useMoney';
+import { photoUrl, primaryPhoto } from '@/services/products';
 import { useFavoritesStore } from '@/stores/favorites';
 import type { Product } from '@/types/marketplace';
 
@@ -49,6 +51,7 @@ const props = defineProps<{ product: Product }>();
 const router = useRouter();
 const fav = useFavoritesStore();
 const sale = computed(() => discountPercent(props.product.price, props.product.oldPrice));
+const cover = computed(() => photoUrl(primaryPhoto(props.product.photos), 'small'));
 
 function open() {
   void router.push({ name: 'product', params: { id: props.product.id } });
@@ -70,6 +73,17 @@ async function onFav() {
   overflow: hidden;
   border-radius: 14px;
   background: #fff;
+}
+
+.product-card__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border-radius: 14px;
+  background: #eef0f5;
+  color: #8b90a0;
+  font-size: 13px;
 }
 
 .product-card__fav {

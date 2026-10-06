@@ -34,12 +34,24 @@ export interface ProductVariant {
   options: string[];
 }
 
+export interface ProductPhotoUrls {
+  master: string;
+  large?: string | undefined;
+  small?: string | undefined;
+}
+
+export interface ProductPhoto {
+  isPrimary: boolean;
+  sortOrder: number;
+  urls: ProductPhotoUrls;
+}
+
 export interface Product {
   id: string;
   title: string;
   description: string;
   collectionId: string;
-  images: string[];
+  photos: ProductPhoto[];
   price: number;
   oldPrice?: number | undefined;
   rating: number;

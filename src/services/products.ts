@@ -1,5 +1,10 @@
-import { apiRequest } from '@/services/http';
-import type { Product, Seller } from '@/types/marketplace';
+import { ApiError, apiRequest } from '@/services/http';
+import type { Product, ProductPhoto, ProductPhotoUrls, Seller } from '@/types/marketplace';
+
+export const PRODUCT_IMAGE_TYPES = ['jpeg', 'png', 'webp', 'heic', 'heif', 'avif'] as const;
+export const PRODUCT_IMAGE_MAX_KB = 8192;
+
+export type PhotoSlot = 'small' | 'large' | 'master';
 
 const MINOR_UNITS = 100;
 const PAGE_SIZE = 20;
@@ -14,10 +19,22 @@ interface ProductCollection {
   name: string;
 }
 
+interface PhotoUrlsPayload {
+  master?: string;
+  large?: string;
+  small?: string;
+}
+
+interface PhotoPayload {
+  is_primary: boolean;
+  sort_order: number;
+  urls?: PhotoUrlsPayload;
+}
+
 interface ProductCardPayload {
   name: string;
   description: string;
-  photos: string[];
+  photos: PhotoPayload[];
   price: number;
   stock: number;
   seller: ProductSeller | null;
@@ -45,6 +62,11 @@ interface ProductShowResponse {
   data: ProductCardPayload;
 }
 
+interface ProductPhotosResponse {
+  status_code: number;
+  data: PhotoPayload[];
+}
+
 export interface ProductQuery {
   q?: string;
   collectionId?: string | undefined;
@@ -65,6 +87,53 @@ function minorUnits(rubles: number): number {
   return Math.round(rubles * MINOR_UNITS);
 }
 
+function filled(value: string | undefined): string | null {
+  if (value == null) {
+    return null;
+  }
+  const trimmed = value.trim();
+  return trimmed === '' ? null : trimmed;
+}
+
+export function primaryPhoto(photos: ProductPhoto[]): ProductPhoto | undefined {
+  return photos.find((photo) => photo.isPrimary) ?? photos[0];
+}
+
+export function photoUrl(photo: ProductPhoto | undefined, slot: PhotoSlot): string | null {
+  if (!photo) {
+    return null;
+  }
+
+  const { master, large, small } = photo.urls;
+  if (slot === 'small') {
+    return filled(small) ?? filled(master);
+  }
+  if (slot === 'large') {
+    return filled(large) ?? filled(master);
+  }
+  return filled(master);
+}
+
+function mapPhoto(photo: PhotoPayload): ProductPhoto {
+  const urls: ProductPhotoUrls = {
+    master: photo.urls?.master ?? '',
+  };
+  const large = filled(photo.urls?.large);
+  const small = filled(photo.urls?.small);
+  if (large) {
+    urls.large = large;
+  }
+  if (small) {
+    urls.small = small;
+  }
+
+  return {
+    isPrimary: photo.is_primary,
+    sortOrder: photo.sort_order,
+    urls,
+  };
+}
+
 function mapSeller(seller: ProductSeller | null): Seller | null {
   if (!seller) {
     return null;
@@ -82,7 +151,7 @@ function mapProduct(id: string, payload: ProductCardPayload): Product {
     title: payload.name,
     description: payload.description,
     collectionId: payload.collection ? String(payload.collection.id) : '',
-    images: payload.photos,
+    photos: (payload.photos ?? []).map(mapPhoto),
     price: payload.price / MINOR_UNITS,
     rating: payload.rating_avg,
     reviewCount: payload.reviews_count,
@@ -126,4 +195,87 @@ export async function fetchProduct(id: string): Promise<Product> {
   const response = await apiRequest<ProductShowResponse>(`/v1/products/${id}`);
 
   return mapProduct(id, response.data);
+}
+
+export class ProductImageUploadError extends ApiError {
+  readonly fileErrors: Readonly<Record<number, string>>;
+
+  constructor(
+    status: number,
+    message: string,
+    errors: Record<string, string[]>,
+    fileErrors: Record<number, string>,
+  ) {
+    super(message, status, errors);
+    this.name = 'ProductImageUploadError';
+    this.fileErrors = fileErrors;
+  }
+}
+
+function fileErrorsFrom(errors: Record<string, string[]>): Record<number, string> {
+  const result: Record<number, string> = {};
+  for (const [key, messages] of Object.entries(errors)) {
+    const match = /^images\.(\d+)(?:\.|$)/.exec(key);
+    const message = messages[0];
+    if (!match || !message) {
+      continue;
+    }
+    const index = Number(match[1]);
+    if (result[index] === undefined) {
+      result[index] = message;
+    }
+  }
+  return result;
+}
+
+function uploadMessage(error: ApiError): string {
+  if (error.status === 401) {
+    return error.message === 'Запрос не выполнен' ? 'Нет токена' : error.message;
+  }
+  if (error.status === 403) {
+    if (error.message === 'Запрос не выполнен' || /не найден/i.test(error.message)) {
+      return 'Недостаточно прав';
+    }
+    return error.message;
+  }
+  if (error.status === 404) {
+    return error.message === 'Запрос не выполнен' ? 'Товар не найден' : error.message;
+  }
+  if (error.status === 422) {
+    return error.errors.primary?.[0] ?? error.errors.images?.[0] ?? error.message;
+  }
+  return error.message;
+}
+
+export async function uploadProductImages(
+  productId: string,
+  token: string,
+  files: File[],
+  primaryIndex: number,
+): Promise<ProductPhoto[]> {
+  const form = new FormData();
+  for (const file of files) {
+    form.append('images[]', file, file.name);
+  }
+  form.append('primary', String(primaryIndex));
+
+  try {
+    const response = await apiRequest<ProductPhotosResponse>(`/seller/products/${productId}/images`, {
+      method: 'POST',
+      body: form,
+      token,
+    });
+    return (response.data ?? []).map(mapPhoto);
+  } catch (error) {
+    if (!(error instanceof ApiError)) {
+      throw error;
+    }
+    const fileErrors = fileErrorsFrom(error.errors);
+    throw new ProductImageUploadError(
+      error.status,
+      uploadMessage(error),
+      error.errors,
+      fileErrors,
+    );
+  }
 }
