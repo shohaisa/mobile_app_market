@@ -90,8 +90,9 @@ export default defineConfig((/* ctx */) => {
       open: false,
       proxy: {
         '/api': {
-          target: 'http://127.0.0.1:8080',
+          target: 'https://qazan.billium.kg',
           changeOrigin: true,
+          secure: true,
         },
       },
     },
