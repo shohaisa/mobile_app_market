@@ -34,10 +34,6 @@ body,
   padding-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
 }
 
-.q-footer {
-  padding-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
-}
-
 .q-page {
   min-height: 100%;
 }

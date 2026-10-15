@@ -40,16 +40,21 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
 import PriceBlock from '@/components/PriceBlock.vue';
 import { hapticLight } from '@/composables/useHaptics';
 import { discountPercent } from '@/composables/useMoney';
+import { buyerErrorMessage } from '@/services/http';
 import { photoUrl, primaryPhoto } from '@/services/products';
 import { useFavoritesStore } from '@/stores/favorites';
+import { useUserStore } from '@/stores/user';
 import type { Product } from '@/types/marketplace';
 
 const props = defineProps<{ product: Product }>();
 const router = useRouter();
+const $q = useQuasar();
 const fav = useFavoritesStore();
+const user = useUserStore();
 const sale = computed(() => discountPercent(props.product.price, props.product.oldPrice));
 const cover = computed(() => photoUrl(primaryPhoto(props.product.photos), 'small'));
 
@@ -59,7 +64,15 @@ function open() {
 
 async function onFav() {
   await hapticLight();
-  await fav.toggle(props.product.id);
+  if (!user.token) {
+    void router.push({ name: 'profile' });
+    return;
+  }
+  try {
+    await fav.toggle(props.product.id);
+  } catch (error) {
+    $q.notify({ type: 'negative', message: buyerErrorMessage(error) });
+  }
 }
 </script>
 

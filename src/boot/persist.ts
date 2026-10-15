@@ -12,11 +12,6 @@ export default defineBoot(async () => {
   const catalog = useCatalogStore();
   const user = useUserStore();
 
-  await Promise.all([
-    cart.hydrate(),
-    favorites.hydrate(),
-    orders.hydrate(),
-    catalog.fetchAll(),
-    user.fetchProfile(),
-  ]);
+  await Promise.all([orders.hydrate(), catalog.fetchAll(), user.fetchProfile()]);
+  await Promise.all([cart.hydrate(), favorites.hydrate()]);
 });

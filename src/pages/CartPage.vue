@@ -5,7 +5,13 @@
       <div class="text-caption muted">{{ plural(cart.count, 'товар', 'товара', 'товаров') }}</div>
     </div>
 
-    <div v-if="!cart.items.length" class="empty-state">
+    <div v-if="!user.token" class="empty-state">
+      <q-icon name="shopping_bag" size="52px" />
+      <div class="text-subtitle1 text-dark q-mt-sm">Войдите, чтобы собрать корзину</div>
+      <q-btn unelevated color="primary" no-caps label="Войти" :to="{ name: 'profile' }" />
+    </div>
+
+    <div v-else-if="!cart.items.length" class="empty-state">
       <q-icon name="shopping_bag" size="52px" />
       <div class="text-subtitle1 text-dark q-mt-sm">Пока пусто</div>
       <div class="q-mb-md">Добавьте товары из каталога</div>
@@ -13,7 +19,8 @@
     </div>
 
     <div v-else class="page-pad">
-      <div v-for="item in cart.items" :key="item.productId + (item.variant ?? '')" class="cart-item card-soft q-pa-sm q-mb-sm">
+      <div v-if="cart.error" class="text-negative text-caption q-mb-sm">{{ cart.error }}</div>
+      <div v-for="item in cart.items" :key="item.lineId" class="cart-item card-soft q-pa-sm q-mb-sm">
         <q-img v-if="item.image" :src="item.image" width="84px" height="84px" class="rounded-borders" />
         <div v-else class="cart-item__placeholder rounded-borders">Нет фото</div>
         <div class="cart-item__body">
@@ -21,8 +28,13 @@
           <div v-if="item.variant" class="text-caption muted">{{ item.variant }}</div>
           <PriceBlock :price="item.price" :old-price="item.oldPrice" size="sm" />
           <div class="row items-center justify-between q-mt-xs">
-            <QtyStepper :model-value="item.qty" @update:model-value="(qty) => onQty(item, qty)" />
-            <q-btn flat dense round icon="delete" color="grey-7" @click="cart.remove(item.productId, item.variant)" />
+            <QtyStepper
+              :key="`${item.lineId}-${item.qty}-${cart.qtyEpoch}`"
+              :model-value="item.qty"
+              :max="Math.max(1, item.stock)"
+              @update:model-value="(qty) => onQty(item, qty)"
+            />
+            <q-btn flat dense round icon="delete" color="grey-7" @click="cart.remove(item.lineId)" />
           </div>
         </div>
       </div>
@@ -97,11 +109,11 @@ function goCheckout(): void {
 }
 
 async function onQty(item: CartItem, qty: number) {
-  await cart.setQty(item.productId, qty, item.variant);
+  await cart.setQty(item.lineId, qty);
 }
 
-async function applyPromo() {
-  await cart.applyPromo(promo.value);
+function applyPromo() {
+   cart.applyPromo(promo.value);
 }
 </script>
 

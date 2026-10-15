@@ -127,10 +127,12 @@ import PriceBlock from '@/components/PriceBlock.vue';
 import StickyCartBar from '@/components/StickyCartBar.vue';
 import { hapticLight } from '@/composables/useHaptics';
 import { discountPercent } from '@/composables/useMoney';
+import { buyerErrorMessage } from '@/services/http';
 import { photoUrl } from '@/services/products';
 import { useCartStore } from '@/stores/cart';
 import { useCatalogStore } from '@/stores/catalog';
 import { useFavoritesStore } from '@/stores/favorites';
+import { useUserStore } from '@/stores/user';
 
 const route = useRoute();
 const router = useRouter();
@@ -138,6 +140,7 @@ const $q = useQuasar();
 const catalog = useCatalogStore();
 const cart = useCartStore();
 const favorites = useFavoritesStore();
+const user = useUserStore();
 const slide = ref(0);
 const selected = reactive<Record<string, string>>({});
 const missing = ref(false);
@@ -153,19 +156,7 @@ const sale = computed(() =>
   product.value ? discountPercent(product.value.price, product.value.oldPrice) : null,
 );
 
-const variantLabel = computed(() =>
-  Object.values(selected)
-    .filter(Boolean)
-    .join(' · '),
-);
-
-const inCart = computed(() =>
-  cart.items.some(
-    (item) =>
-      item.productId === product.value?.id &&
-      (item.variant ?? '') === (variantLabel.value || ''),
-  ),
-);
+const inCart = computed(() => cart.items.some((item) => item.productId === product.value?.id));
 
 watch(
   () => String(route.params.id),
@@ -208,14 +199,30 @@ function formatDate(value: string): string {
 async function onFav() {
   if (!product.value) return;
   await hapticLight();
-  await favorites.toggle(product.value.id);
+  if (!user.token) {
+    void router.push({ name: 'profile' });
+    return;
+  }
+  try {
+    await favorites.toggle(product.value.id);
+  } catch (error) {
+    $q.notify({ type: 'negative', message: buyerErrorMessage(error) });
+  }
 }
 
 async function addToCart() {
   if (!product.value || !product.value.inStock) return;
   await hapticLight();
-  await cart.add(product.value, 1, variantLabel.value || undefined);
-  $q.notify({ type: 'positive', message: 'Товар добавлен в корзину' });
+  if (!user.token) {
+    void router.push({ name: 'profile' });
+    return;
+  }
+  try {
+    await cart.add(product.value, 1);
+    $q.notify({ type: 'positive', message: 'Товар добавлен в корзину' });
+  } catch (error) {
+    $q.notify({ type: 'negative', message: buyerErrorMessage(error) });
+  }
 }
 </script>
 

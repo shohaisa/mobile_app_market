@@ -66,12 +66,14 @@ export interface Product {
 }
 
 export interface CartItem {
+  lineId: number;
   productId: string;
   title: string;
   image: string;
   price: number;
   oldPrice?: number | undefined;
   qty: number;
+  stock: number;
   variant?: string | undefined;
 }
 

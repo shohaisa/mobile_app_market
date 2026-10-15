@@ -52,3 +52,26 @@ export async function apiRequest<T>(
 
   return payload as T;
 }
+
+export function buyerErrorMessage(error: unknown): string {
+  if (!(error instanceof ApiError)) {
+    return 'Запрос не выполнен';
+  }
+  if (error.status === 401) {
+    return 'Нет токена';
+  }
+
+  const product = error.errors.product_id?.[0] ?? error.message;
+  const quantity = error.errors.quantity?.[0] ?? error.message;
+  if (product === 'The product is not available.') {
+    return 'Товар недоступен';
+  }
+  if (quantity === 'The quantity exceeds available stock.') {
+    return 'Количество больше остатка';
+  }
+  if (error.status === 404) {
+    return 'Не найдено';
+  }
+
+  return error.message;
+}
