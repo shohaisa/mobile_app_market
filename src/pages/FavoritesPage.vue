@@ -4,11 +4,16 @@
       <div class="text-h6 text-weight-bold">Избранное</div>
     </div>
     <div class="page-pad">
-      <div v-if="loading" class="empty-state">
+      <div v-if="!user.token" class="empty-state">
+        <q-icon name="favorite" size="52px" />
+        <div class="text-subtitle1 text-dark q-mt-sm">Войдите, чтобы видеть избранное</div>
+        <q-btn unelevated color="primary" no-caps label="Войти" :to="{ name: 'profile' }" />
+      </div>
+      <div v-else-if="!favorites.hydrated" class="empty-state">
         <q-spinner color="primary" size="32px" />
       </div>
-      <div v-else-if="products.length" class="product-grid">
-        <ProductCard v-for="product in products" :key="product.id" :product="product" />
+      <div v-else-if="favorites.products.length" class="product-grid">
+        <ProductCard v-for="product in favorites.products" :key="product.id" :product="product" />
       </div>
       <div v-else class="empty-state">
         <q-icon name="favorite" size="52px" />
@@ -20,45 +25,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
 import ProductCard from '@/components/ProductCard.vue';
-import { useCatalogStore } from '@/stores/catalog';
 import { useFavoritesStore } from '@/stores/favorites';
-import type { Product } from '@/types/marketplace';
+import { useUserStore } from '@/stores/user';
 
-const catalog = useCatalogStore();
 const favorites = useFavoritesStore();
-const products = ref<Product[]>([]);
-const loading = ref(false);
-let request = 0;
-
-watch(
-  () => favorites.ids,
-  async (ids) => {
-    const current = ++request;
-    loading.value = true;
-    try {
-      const loaded = await Promise.all(
-        ids.map(async (id) => {
-          try {
-            return await catalog.loadProduct(id);
-          } catch {
-            return catalog.productById(id) ?? null;
-          }
-        }),
-      );
-      if (current !== request) {
-        return;
-      }
-      products.value = loaded.filter((item): item is Product => item !== null);
-    } finally {
-      if (current === request) {
-        loading.value = false;
-      }
-    }
-  },
-  { immediate: true },
-);
+const user = useUserStore();
 </script>
 
 <style scoped lang="scss">

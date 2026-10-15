@@ -43,13 +43,13 @@ interface ProductCardPayload {
   reviews_count: number;
 }
 
-interface ProductListItem extends ProductCardPayload {
+export interface CatalogProductPayload extends ProductCardPayload {
   id: number;
 }
 
 interface ProductListResponse {
   status_code: number;
-  data: ProductListItem[];
+  data: CatalogProductPayload[];
   meta: {
     page: number;
     per_page: number;
@@ -161,6 +161,10 @@ function mapProduct(id: string, payload: ProductCardPayload): Product {
     inStock: payload.stock > 0,
     reviews: [],
   };
+}
+
+export function productFromSummary(item: CatalogProductPayload): Product {
+  return mapProduct(String(item.id), item);
 }
 
 export async function fetchProducts(query: ProductQuery = {}): Promise<ProductList> {

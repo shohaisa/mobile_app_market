@@ -62,16 +62,33 @@ export const useUserStore = defineStore('user', () => {
     loaded.value = true;
   }
 
+  async function reloadBuyerLists(): Promise<void> {
+    const { useCartStore } = await import('@/stores/cart');
+    const { useFavoritesStore } = await import('@/stores/favorites');
+    await Promise.all([useCartStore().refresh(), useFavoritesStore().refresh()]);
+  }
+
+  async function clearBuyerLists(): Promise<void> {
+    const [{ useCartStore }, { useFavoritesStore }] = await Promise.all([
+      import('@/stores/cart'),
+      import('@/stores/favorites'),
+    ]);
+    useCartStore().reset();
+    useFavoritesStore().reset();
+  }
+
   async function signInWithGoogle(idToken: string): Promise<void> {
     const session = await loginWithGoogle(idToken);
     token.value = session.token;
     applyProfile(await fetchCurrentUser(session.token));
+    await reloadBuyerLists();
   }
 
   async function signInWithApple(idToken: string, name?: string, nonce?: string): Promise<void> {
     const session = await loginWithApple(idToken, name, nonce);
     token.value = session.token;
     applyProfile(await fetchCurrentUser(session.token));
+    await reloadBuyerLists();
   }
 
   async function saveProfile(attributes: ProfileUpdate): Promise<void> {
@@ -87,6 +104,7 @@ export const useUserStore = defineStore('user', () => {
     token.value = null;
     user.value = null;
     profileComplete.value = false;
+    await clearBuyerLists();
     await saveToken(null);
     if (current) {
       try {

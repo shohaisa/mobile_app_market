@@ -1,43 +1,64 @@
 import { defineStore, acceptHMRUpdate } from 'pinia';
 import { computed, ref } from 'vue';
-import { getJson, setJson } from '@/services/storage';
-
-const STORAGE_KEY = 'market.favorites';
+import { fetchFavorites, toggleFavorite } from '@/services/favorites';
+import { ApiError } from '@/services/http';
+import { useUserStore } from '@/stores/user';
+import type { Product } from '@/types/marketplace';
 
 export const useFavoritesStore = defineStore('favorites', () => {
-  const ids = ref<string[]>([]);
+  const products = ref<Product[]>([]);
   const hydrated = ref(false);
 
-  const count = computed(() => ids.value.length);
+  const ids = computed(() => products.value.map((product) => product.id));
+  const count = computed(() => products.value.length);
 
   function has(id: string): boolean {
     return ids.value.includes(id);
-  }
-
-  async function persist(): Promise<void> {
-    await setJson(STORAGE_KEY, ids.value);
   }
 
   async function hydrate(): Promise<void> {
     if (hydrated.value) {
       return;
     }
-    ids.value = await getJson<string[]>(STORAGE_KEY, []);
+
+    const token = useUserStore().token;
+    if (!token) {
+      products.value = [];
+      hydrated.value = true;
+      return;
+    }
+
+    try {
+      products.value = await fetchFavorites(token);
+    } catch {
+      products.value = [];
+    }
+    hydrated.value = true;
+  }
+
+  async function refresh(): Promise<void> {
+    hydrated.value = false;
+    await hydrate();
+  }
+
+  function reset(): void {
+    products.value = [];
     hydrated.value = true;
   }
 
   async function toggle(id: string): Promise<boolean> {
-    if (has(id)) {
-      ids.value = ids.value.filter((item) => item !== id);
-      await persist();
-      return false;
+    const token = useUserStore().token;
+    if (!token) {
+      throw new ApiError('Нет токена', 401);
     }
-    ids.value = [...ids.value, id];
-    await persist();
-    return true;
+
+    const favorited = await toggleFavorite(token, Number(id));
+    products.value = await fetchFavorites(token);
+
+    return favorited;
   }
 
-  return { ids, count, has, hydrate, toggle };
+  return { products, ids, count, hydrated, has, hydrate, refresh, reset, toggle };
 });
 
 if (import.meta.hot) {
