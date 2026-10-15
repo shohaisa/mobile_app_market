@@ -7,8 +7,6 @@ import type { CartItem, Product } from '@/types/marketplace';
 
 export const useCartStore = defineStore('cart', () => {
   const items = ref<CartItem[]>([]);
-  const promoCode = ref('');
-  const promoError = ref('');
   const error = ref('');
   const qtyEpoch = ref(0);
   const hydrated = ref(false);
@@ -19,18 +17,7 @@ export const useCartStore = defineStore('cart', () => {
     items.value.reduce((sum, item) => sum + item.price * item.qty, 0),
   );
 
-  const discount = computed(() => {
-    const code = promoCode.value.trim().toUpperCase();
-    if (code === 'MARKET10') {
-      return Math.round(subtotal.value * 0.1);
-    }
-    if (code === 'MARKET500') {
-      return Math.min(500, subtotal.value);
-    }
-    return 0;
-  });
-
-  const total = computed(() => Math.max(0, subtotal.value - discount.value));
+  const total = computed(() => subtotal.value);
 
   async function hydrate(): Promise<void> {
     if (hydrated.value) {
@@ -62,8 +49,6 @@ export const useCartStore = defineStore('cart', () => {
   function reset(): void {
     items.value = [];
     error.value = '';
-    promoCode.value = '';
-    promoError.value = '';
     hydrated.value = true;
   }
 
@@ -120,22 +105,6 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
-  function applyPromo(code: string): boolean {
-    const normalized = code.trim().toUpperCase();
-    if (!normalized) {
-      promoCode.value = '';
-      promoError.value = '';
-      return true;
-    }
-    if (normalized === 'MARKET10' || normalized === 'MARKET500') {
-      promoCode.value = normalized;
-      promoError.value = '';
-      return true;
-    }
-    promoError.value = 'Промокод не найден';
-    return false;
-  }
-
   async function clear(): Promise<void> {
     const token = useUserStore().token;
     if (token) {
@@ -148,19 +117,14 @@ export const useCartStore = defineStore('cart', () => {
       }
     }
     items.value = [];
-    promoCode.value = '';
-    promoError.value = '';
   }
 
   return {
     items,
-    promoCode,
-    promoError,
     error,
     qtyEpoch,
     count,
     subtotal,
-    discount,
     total,
     hydrate,
     refresh,
@@ -168,7 +132,6 @@ export const useCartStore = defineStore('cart', () => {
     add,
     setQty,
     remove,
-    applyPromo,
     clear,
   };
 });

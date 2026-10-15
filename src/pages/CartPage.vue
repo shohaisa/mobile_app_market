@@ -40,26 +40,9 @@
       </div>
 
       <div class="card-soft q-pa-md q-mt-md">
-        <div class="text-weight-bold q-mb-sm">Промокод</div>
-        <div class="row no-wrap q-gutter-sm">
-          <q-input v-model="promo" dense outlined placeholder="MARKET10" class="col" />
-          <q-btn unelevated color="primary" no-caps label="Применить" @click="applyPromo" />
-        </div>
-        <div v-if="cart.promoError" class="text-negative text-caption q-mt-xs">{{ cart.promoError }}</div>
-        <div v-else-if="cart.discount" class="text-positive text-caption q-mt-xs">
-          Скидка {{ formatMoney(cart.discount) }}
-        </div>
-        <div class="text-caption muted q-mt-xs">Попробуйте MARKET10 или MARKET500</div>
-      </div>
-
-      <div class="card-soft q-pa-md q-mt-md">
         <div class="row justify-between q-mb-xs">
           <span class="muted">Товары</span>
           <span>{{ formatMoney(cart.subtotal) }}</span>
-        </div>
-        <div class="row justify-between q-mb-xs">
-          <span class="muted">Скидка</span>
-          <span class="text-accent">−{{ formatMoney(cart.discount) }}</span>
         </div>
         <div class="row justify-between text-weight-bold text-subtitle1 q-mt-sm">
           <span>Итого</span>
@@ -84,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import PriceBlock from '@/components/PriceBlock.vue';
 import QtyStepper from '@/components/QtyStepper.vue';
@@ -96,7 +79,6 @@ import type { CartItem } from '@/types/marketplace';
 const router = useRouter();
 const cart = useCartStore();
 const user = useUserStore();
-const promo = ref(cart.promoCode);
 const canOrder = computed(() => Boolean(user.token) && user.profileComplete);
 const profileHint = computed(() =>
   user.token
@@ -110,10 +92,6 @@ function goCheckout(): void {
 
 async function onQty(item: CartItem, qty: number) {
   await cart.setQty(item.lineId, qty);
-}
-
-function applyPromo() {
-   cart.applyPromo(promo.value);
 }
 </script>
 

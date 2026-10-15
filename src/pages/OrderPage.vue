@@ -36,10 +36,6 @@
           <span class="muted">Оплата</span>
           <span>{{ order.payment.title }}</span>
         </div>
-        <div v-if="order.promoCode" class="row justify-between q-mb-xs">
-          <span class="muted">Промокод</span>
-          <span>{{ order.promoCode }}</span>
-        </div>
         <div class="row justify-between text-weight-bold text-subtitle1 q-mt-sm">
           <span>Итого</span>
           <span>{{ formatMoney(order.total) }}</span>

@@ -116,8 +116,6 @@ export interface Order {
   address: Address;
   delivery: DeliveryOption;
   payment: PaymentOption;
-  promoCode?: string | undefined;
-  discount: number;
   deliveryPrice: number;
   total: number;
 }

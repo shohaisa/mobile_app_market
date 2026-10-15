@@ -78,7 +78,7 @@
       <q-btn
         unelevated
         color="primary"
-        class="full-width q-mt-md"
+        class="full-width q-my-md"
         no-caps
         size="lg"
         :loading="submitting"
@@ -152,8 +152,6 @@ async function submit() {
       address,
       delivery: delivery.value,
       payment: payment.value,
-      promoCode: cart.promoCode || undefined,
-      discount: cart.discount,
       deliveryPrice: deliveryPrice.value,
       total: payTotal.value,
     };
