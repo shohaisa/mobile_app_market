@@ -5,7 +5,11 @@
       <div class="text-h6 text-weight-bold">Заказы</div>
     </div>
 
-    <div class="page-pad">
+    <div v-if="orders.error" class="page-pad text-negative">{{ orders.error }}</div>
+
+    <div v-else-if="!orders.sorted.length" class="empty-state">Заказов пока нет</div>
+
+    <div v-else class="page-pad">
       <div
         v-for="order in orders.sorted"
         :key="order.id"
@@ -13,24 +17,14 @@
         @click="router.push({ name: 'order', params: { id: order.id } })"
       >
         <div class="row items-center justify-between">
-          <div class="text-weight-bold">№ {{ order.id }}</div>
-          <q-badge :color="statusColor(order.status)" outline :label="statusLabel(order.status)" />
+          <div class="text-weight-bold">№ {{ order.reference }}</div>
+          <q-badge :color="orderStatusColor(order.status)" outline :label="orderStatusLabel(order.status)" />
         </div>
-        <div class="text-caption muted q-my-xs">{{ formatDate(order.createdAt) }}</div>
-        <div class="row q-gutter-xs q-mb-sm">
-          <template v-for="item in order.items.slice(0, 4)" :key="item.productId + (item.variant ?? '')">
-            <q-img
-              v-if="item.image"
-              :src="item.image"
-              width="44px"
-              height="44px"
-              class="rounded-borders"
-            />
-            <div v-else class="order-thumb rounded-borders">Нет фото</div>
-          </template>
+        <div class="text-caption muted q-my-xs line-clamp-2">
+          {{ order.lines.map((line) => line.name).join(', ') }}
         </div>
         <div class="row justify-between text-weight-medium">
-          <span>{{ order.items.reduce((sum, item) => sum + item.qty, 0) }} тов.</span>
+          <span>{{ itemCount(order) }} тов.</span>
           <span>{{ formatMoney(order.total) }}</span>
         </div>
       </div>
@@ -39,41 +33,22 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { formatMoney } from '@/composables/useMoney';
+import { orderStatusColor, orderStatusLabel } from '@/services/orders';
 import { useOrdersStore } from '@/stores/orders';
-import type { OrderStatus } from '@/types/marketplace';
+import type { Order } from '@/types/marketplace';
 
 const router = useRouter();
 const orders = useOrdersStore();
 
-function statusLabel(status: OrderStatus): string {
-  const map: Record<OrderStatus, string> = {
-    processing: 'Собираем',
-    shipping: 'В пути',
-    delivered: 'Доставлен',
-    cancelled: 'Отменён',
-  };
-  return map[status];
-}
+onMounted(() => {
+  void orders.refresh();
+});
 
-function statusColor(status: OrderStatus): string {
-  const map: Record<OrderStatus, string> = {
-    processing: 'info',
-    shipping: 'primary',
-    delivered: 'positive',
-    cancelled: 'grey',
-  };
-  return map[status];
-}
-
-function formatDate(value: string): string {
-  return new Intl.DateTimeFormat('ru-RU', {
-    day: 'numeric',
-    month: 'long',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(value));
+function itemCount(order: Order): number {
+  return order.lines.reduce((sum, line) => sum + line.quantity, 0);
 }
 </script>
 
@@ -83,18 +58,5 @@ function formatDate(value: string): string {
   padding-top: calc(8px + var(--safe-area-inset-top, env(safe-area-inset-top, 0px)));
   background: #fff;
   gap: 4px;
-}
-
-.order-thumb {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  background: #eef0f5;
-  color: #8b90a0;
-  font-size: 8px;
-  line-height: 1.1;
-  text-align: center;
 }
 </style>

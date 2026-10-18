@@ -1,14 +1,4 @@
-import { photoUrl, primaryPhoto } from '@/services/products';
-import type {
-  Address,
-  Banner,
-  DeliveryOption,
-  Order,
-  PaymentOption,
-  Product,
-  ProductPhoto,
-  User,
-} from '@/types/marketplace';
+import type { Banner, Product, ProductPhoto } from '@/types/marketplace';
 
 function img(path: string, n = 1): string {
   return `https://cdn.dummyjson.com/product-images/${path}/${n}.webp`;
@@ -20,10 +10,6 @@ function photosOf(...urls: string[]): ProductPhoto[] {
     sortOrder: index,
     urls: { master: url, small: url },
   }));
-}
-
-function preview(product: Product | undefined): string {
-  return photoUrl(primaryPhoto(product?.photos ?? []), 'small') ?? '';
 }
 
 export const banners: Banner[] = [
@@ -418,122 +404,5 @@ export const products: Product[] = [
     seller: sellerMarket,
     inStock: true,
     reviews: [],
-  },
-];
-
-export const currentUser: User = {
-  name: 'Анна Смирнова',
-  email: 'anna.smirnova@example.com',
-  phone: '+7 900 123-45-67',
-  address: '',
-};
-
-export const addresses: Address[] = [
-  {
-    id: 'a1',
-    city: 'Москва',
-    street: 'ул. Тверская, 12',
-    apartment: 'кв. 45',
-    comment: 'Домофон 45, 3 этаж',
-  },
-  {
-    id: 'a2',
-    city: 'Москва',
-    street: 'Пресненская наб., 8с1',
-    apartment: 'офис 21',
-  },
-];
-
-export const deliveryOptions: DeliveryOption[] = [
-  { id: 'pickup', title: 'Пункт выдачи', hint: '2–4 дня', price: 99 },
-  { id: 'courier', title: 'Курьер', hint: '1–2 дня', price: 299 },
-  { id: 'express', title: 'Экспресс сегодня', hint: '3–6 часов', price: 599 },
-];
-
-export const paymentOptions: PaymentOption[] = [
-  { id: 'card', title: 'Карта', hint: 'Visa, Mastercard, Мир', icon: 'credit_card' },
-  { id: 'sbp', title: 'СБП', hint: 'Оплата по QR', icon: 'qr_code_2' },
-  { id: 'cod', title: 'При получении', hint: 'Наличные или карта курьеру', icon: 'payments' },
-];
-
-export const initialOrders: Order[] = [
-  {
-    id: '100245',
-    createdAt: '2026-09-10T14:20:00.000Z',
-    status: 'delivered',
-    items: [
-      {
-        lineId: 1,
-        productId: 'p2',
-        title: 'Беспроводные наушники Pulse Air',
-        image: preview(products[1]),
-        price: 7990,
-        oldPrice: 11990,
-        qty: 1,
-        stock: 1,
-        variant: 'Чёрный',
-      },
-    ],
-    address: addresses[0] as Address,
-    delivery: deliveryOptions[0] as DeliveryOption,
-    payment: paymentOptions[0] as PaymentOption,
-    deliveryPrice: 99,
-    total: 8089,
-  },
-  {
-    id: '100312',
-    createdAt: '2026-09-15T09:05:00.000Z',
-    status: 'shipping',
-    items: [
-      {
-        lineId: 2,
-        productId: 'p6',
-        title: 'Кроссовки RunFlow Air',
-        image: preview(products[5]),
-        price: 6990,
-        oldPrice: 9990,
-        qty: 1,
-        stock: 1,
-        variant: '42',
-      },
-      {
-        lineId: 3,
-        productId: 'p5',
-        title: 'Футболка Oversize Cotton',
-        image: preview(products[4]),
-        price: 1490,
-        oldPrice: 2290,
-        qty: 2,
-        stock: 2,
-        variant: 'Чёрный · M',
-      },
-    ],
-    address: addresses[0] as Address,
-    delivery: deliveryOptions[1] as DeliveryOption,
-    payment: paymentOptions[1] as PaymentOption,
-    deliveryPrice: 299,
-    total: 10269,
-  },
-  {
-    id: '100088',
-    createdAt: '2026-08-02T18:40:00.000Z',
-    status: 'cancelled',
-    items: [
-      {
-        lineId: 4,
-        productId: 'p14',
-        title: 'Фен AirFlow Pro',
-        image: preview(products[13]),
-        price: 3990,
-        oldPrice: 5490,
-        qty: 1,
-        stock: 1,
-      },
-    ],
-    address: addresses[1] as Address,
-    delivery: deliveryOptions[0] as DeliveryOption,
-    payment: paymentOptions[2] as PaymentOption,
-    deliveryPrice: 99,
-    total: 4089,
   },
 ];

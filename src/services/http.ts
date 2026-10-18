@@ -63,11 +63,18 @@ export function buyerErrorMessage(error: unknown): string {
 
   const product = error.errors.product_id?.[0] ?? error.message;
   const quantity = error.errors.quantity?.[0] ?? error.message;
+  const cart = error.errors.cart?.[0] ?? error.message;
   if (product === 'The product is not available.') {
     return 'Товар недоступен';
   }
   if (quantity === 'The quantity exceeds available stock.') {
     return 'Количество больше остатка';
+  }
+  if (cart === 'The cart is empty.') {
+    return 'Корзина пуста';
+  }
+  if (cart === 'A phone number and address are required before checkout.') {
+    return 'Укажите телефон и адрес в профиле, чтобы оформить заказ.';
   }
   if (error.status === 404) {
     return 'Не найдено';

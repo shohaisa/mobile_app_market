@@ -1,49 +1,61 @@
 import { defineStore, acceptHMRUpdate } from 'pinia';
 import { computed, ref } from 'vue';
-import { api } from '@/services/api';
-import { getJson, setJson } from '@/services/storage';
+import { buyerErrorMessage } from '@/services/http';
+import { fetchOrders } from '@/services/orders';
+import { useUserStore } from '@/stores/user';
 import type { Order } from '@/types/marketplace';
-
-const STORAGE_KEY = 'market.orders';
 
 export const useOrdersStore = defineStore('orders', () => {
   const orders = ref<Order[]>([]);
+  const error = ref('');
   const hydrated = ref(false);
 
-  const sorted = computed(() =>
-    [...orders.value].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    ),
-  );
-
-  async function persist(): Promise<void> {
-    await setJson(STORAGE_KEY, orders.value);
-  }
+  const sorted = computed(() => [...orders.value].sort((left, right) => right.id - left.id));
 
   async function hydrate(): Promise<void> {
     if (hydrated.value) {
       return;
     }
-    const saved = await getJson<Order[] | null>(STORAGE_KEY, null);
-    if (saved && saved.length) {
-      orders.value = saved;
-    } else {
-      orders.value = await api.getOrders();
-      await persist();
+
+    const token = useUserStore().token;
+    if (!token) {
+      orders.value = [];
+      error.value = '';
+      hydrated.value = true;
+      return;
+    }
+
+    try {
+      orders.value = await fetchOrders(token);
+      error.value = '';
+    } catch (cause) {
+      orders.value = [];
+      error.value = buyerErrorMessage(cause);
     }
     hydrated.value = true;
   }
 
-  function byId(id: string): Order | undefined {
+  async function refresh(): Promise<void> {
+    hydrated.value = false;
+    await hydrate();
+  }
+
+  function reset(): void {
+    orders.value = [];
+    error.value = '';
+    hydrated.value = true;
+  }
+
+  function byId(id: number): Order | undefined {
     return orders.value.find((item) => item.id === id);
   }
 
-  async function add(order: Order): Promise<void> {
-    orders.value = [order, ...orders.value];
-    await persist();
+  function remember(order: Order): void {
+    const rest = orders.value.filter((item) => item.id !== order.id);
+    orders.value = [order, ...rest];
   }
 
-  return { orders, sorted, hydrate, byId, add };
+  return { orders, error, sorted, hydrate, refresh, reset, byId, remember };
 });
 
 if (import.meta.hot) {
