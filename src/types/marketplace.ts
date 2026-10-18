@@ -77,14 +77,6 @@ export interface CartItem {
   variant?: string | undefined;
 }
 
-export interface Address {
-  id: string;
-  city: string;
-  street: string;
-  apartment?: string | undefined;
-  comment?: string | undefined;
-}
-
 export interface User {
   name: string;
   email: string | null;
@@ -92,32 +84,26 @@ export interface User {
   address: string;
 }
 
-export type OrderStatus = 'processing' | 'shipping' | 'delivered' | 'cancelled';
+export type OrderStatus = 'new' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
 
-export interface DeliveryOption {
-  id: string;
-  title: string;
-  hint: string;
-  price: number;
-}
-
-export interface PaymentOption {
-  id: string;
-  title: string;
-  hint: string;
-  icon: string;
+export interface OrderLine {
+  id: number;
+  productId: string | null;
+  name: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
 }
 
 export interface Order {
-  id: string;
-  createdAt: string;
+  id: number;
+  reference: string;
   status: OrderStatus;
-  items: CartItem[];
-  address: Address;
-  delivery: DeliveryOption;
-  payment: PaymentOption;
-  deliveryPrice: number;
+  payment: string;
+  phone: string | null;
+  address: string | null;
   total: number;
+  lines: OrderLine[];
 }
 
 export interface CatalogFilters {

@@ -1,6 +1,5 @@
 import { defineStore, acceptHMRUpdate } from 'pinia';
 import { ref } from 'vue';
-import { api } from '@/services/api';
 import {
   fetchCurrentUser,
   loginWithApple,
@@ -13,14 +12,12 @@ import {
   type ProfileUpdate,
 } from '@/services/auth';
 import { signOutGoogle } from '@/services/google';
-import type { Address, DeliveryOption, PaymentOption, User } from '@/types/marketplace';
+import type { User } from '@/types/marketplace';
 
 export const useUserStore = defineStore('user', () => {
   const user = ref<User | null>(null);
   const token = ref<string | null>(null);
   const profileComplete = ref(false);
-  const deliveryOptions = ref<DeliveryOption[]>([]);
-  const paymentOptions = ref<PaymentOption[]>([]);
   const loaded = ref(false);
 
   function applyProfile(profile: Profile): void {
@@ -38,19 +35,11 @@ export const useUserStore = defineStore('user', () => {
       return;
     }
 
-    const [nextDelivery, nextPayment, storedToken] = await Promise.all([
-      api.getDeliveryOptions(),
-      api.getPaymentOptions(),
-      readToken(),
-    ]);
+    token.value = await readToken();
 
-    deliveryOptions.value = nextDelivery;
-    paymentOptions.value = nextPayment;
-    token.value = storedToken;
-
-    if (storedToken) {
+    if (token.value) {
       try {
-        applyProfile(await fetchCurrentUser(storedToken));
+        applyProfile(await fetchCurrentUser(token.value));
       } catch {
         token.value = null;
         user.value = null;
@@ -63,18 +52,27 @@ export const useUserStore = defineStore('user', () => {
   }
 
   async function reloadBuyerLists(): Promise<void> {
-    const { useCartStore } = await import('@/stores/cart');
-    const { useFavoritesStore } = await import('@/stores/favorites');
-    await Promise.all([useCartStore().refresh(), useFavoritesStore().refresh()]);
+    const [{ useCartStore }, { useFavoritesStore }, { useOrdersStore }] = await Promise.all([
+      import('@/stores/cart'),
+      import('@/stores/favorites'),
+      import('@/stores/orders'),
+    ]);
+    await Promise.all([
+      useCartStore().refresh(),
+      useFavoritesStore().refresh(),
+      useOrdersStore().refresh(),
+    ]);
   }
 
   async function clearBuyerLists(): Promise<void> {
-    const [{ useCartStore }, { useFavoritesStore }] = await Promise.all([
+    const [{ useCartStore }, { useFavoritesStore }, { useOrdersStore }] = await Promise.all([
       import('@/stores/cart'),
       import('@/stores/favorites'),
+      import('@/stores/orders'),
     ]);
     useCartStore().reset();
     useFavoritesStore().reset();
+    useOrdersStore().reset();
   }
 
   async function signInWithGoogle(idToken: string): Promise<void> {
@@ -116,28 +114,16 @@ export const useUserStore = defineStore('user', () => {
     await signOutGoogle();
   }
 
-  function selectedAddress(): Address | undefined {
-    const line = user.value?.address.trim() ?? '';
-    if (line === '') {
-      return undefined;
-    }
-
-    return { id: 'profile', city: '', street: line };
-  }
-
   return {
     user,
     token,
     profileComplete,
-    deliveryOptions,
-    paymentOptions,
     loaded,
     fetchProfile,
     signInWithGoogle,
     signInWithApple,
     saveProfile,
     signOut,
-    selectedAddress,
   };
 });
 
