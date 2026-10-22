@@ -99,6 +99,11 @@
             <q-toggle v-model="notify" color="primary" />
           </q-item-section>
         </q-item>
+        <q-item clickable v-ripple :to="{ name: 'about' }">
+          <q-item-section avatar><q-icon name="info" color="primary" /></q-item-section>
+          <q-item-section>О приложении</q-item-section>
+          <q-item-section side><q-icon name="chevron_right" /></q-item-section>
+        </q-item>
       </q-list>
 
       <div class="profile-brand">

@@ -61,7 +61,7 @@ const activeTab = computed(() => {
   if (name === 'catalog' || name === 'product') return 'catalog';
   if (name === 'cart' || name === 'checkout') return 'cart';
   if (name === 'favorites') return 'favorites';
-  if (name === 'profile' || name === 'orders' || name === 'order') return 'profile';
+  if (name === 'profile' || name === 'orders' || name === 'order' || name === 'about') return 'profile';
   return 'home';
 });
 
