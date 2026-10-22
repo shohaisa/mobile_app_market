@@ -35,7 +35,7 @@
         <q-item clickable v-ripple href="mailto:doniyor199696@gmail.com">
           <q-item-section>
             <q-item-label>Почта</q-item-label>
-            <q-item-label caption>islamisrailov0@gmail.com</q-item-label>
+            <q-item-label caption>doniyor199696@gmail.com</q-item-label>
           </q-item-section>
           <q-item-section side><q-icon name="chevron_right" /></q-item-section>
         </q-item>
