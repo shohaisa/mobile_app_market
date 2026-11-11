@@ -49,6 +49,20 @@
         </div>
         <h1 class="product-page__title">{{ product.title }}</h1>
         <PriceBlock :price="product.price" :old-price="product.oldPrice" size="lg" />
+        <div v-if="product.priceBreaks.length" class="price-tiers">
+          <div class="price-tiers__title">Цена за штуку зависит от количества</div>
+          <div class="price-tiers__note">
+            Сейчас показана цена за 1 шт. В корзине она пересчитается, когда укажете, сколько берёте.
+          </div>
+          <div class="price-tiers__row">
+            <span>1 шт</span>
+            <span>{{ formatMoney(product.price) }}</span>
+          </div>
+          <div v-for="tier in product.priceBreaks" :key="tier.minQuantity" class="price-tiers__row">
+            <span>от {{ tier.minQuantity }} шт</span>
+            <span>{{ formatMoney(tier.price) }} за шт</span>
+          </div>
+        </div>
         <div v-if="product.stock != null" class="muted text-caption q-mt-xs">
           В наличии: {{ product.stock }}
         </div>
@@ -126,7 +140,7 @@ import { useQuasar } from 'quasar';
 import PriceBlock from '@/components/PriceBlock.vue';
 import StickyCartBar from '@/components/StickyCartBar.vue';
 import { hapticLight } from '@/composables/useHaptics';
-import { discountPercent } from '@/composables/useMoney';
+import { discountPercent, formatMoney } from '@/composables/useMoney';
 import { buyerErrorMessage } from '@/services/http';
 import { photoUrl } from '@/services/products';
 import { useCartStore } from '@/stores/cart';
@@ -246,6 +260,36 @@ async function addToCart() {
 
 .product-page__fav {
   right: 12px;
+}
+
+.price-tiers {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #eef4ff;
+}
+
+.price-tiers__title {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.price-tiers__note {
+  margin-top: 4px;
+  color: #5c6370;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.price-tiers__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .product-page__title {

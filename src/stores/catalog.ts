@@ -4,6 +4,7 @@ import { ApiError } from '@/services/http';
 import { api } from '@/services/api';
 import { fetchCollections } from '@/services/collections';
 import { fetchProduct, fetchProducts, type ProductQuery } from '@/services/products';
+import { useUserStore } from '@/stores/user';
 import type { Banner, Collection, Product } from '@/types/marketplace';
 
 export const useCatalogStore = defineStore('catalog', () => {
@@ -26,6 +27,10 @@ export const useCatalogStore = defineStore('catalog', () => {
   );
 
   const listingHasMore = computed(() => products.value.length < listingTotal.value);
+
+  function viewerToken(): string | null {
+    return useUserStore().token;
+  }
 
   function remember(items: Product[]): void {
     if (!items.length) {
@@ -55,7 +60,7 @@ export const useCatalogStore = defineStore('catalog', () => {
       const [nextBanners, nextCollections, home] = await Promise.all([
         api.getBanners(),
         fetchCollections().catch(() => [] as Collection[]),
-        fetchProducts({ page: 1 }).catch(() => null),
+        fetchProducts({ page: 1 }, viewerToken()).catch(() => null),
       ]);
       banners.value = nextBanners;
       collections.value = nextCollections;
@@ -75,7 +80,7 @@ export const useCatalogStore = defineStore('catalog', () => {
     listingLoading.value = true;
     listingQuery.value = query;
     try {
-      const result = await fetchProducts({ ...query, page });
+      const result = await fetchProducts({ ...query, page }, viewerToken());
       if (requestId !== listingRequest) {
         return;
       }
@@ -109,7 +114,7 @@ export const useCatalogStore = defineStore('catalog', () => {
 
   async function loadProduct(id: string): Promise<Product | null> {
     try {
-      const product = await fetchProduct(id);
+      const product = await fetchProduct(id, viewerToken());
       remember([product]);
       return product;
     } catch (error) {
@@ -119,6 +124,17 @@ export const useCatalogStore = defineStore('catalog', () => {
       }
       throw error;
     }
+  }
+
+  async function reload(): Promise<void> {
+    const ids = Object.keys(productCache.value);
+    const query = listingQuery.value;
+    loaded.value = false;
+    await fetchAll();
+    if (query) {
+      await loadListing(query, false);
+    }
+    await Promise.all(ids.map((id) => loadProduct(id).catch(() => null)));
   }
 
   function productById(id: string): Product | undefined {
@@ -177,6 +193,7 @@ export const useCatalogStore = defineStore('catalog', () => {
     loadListing,
     loadMore,
     loadProduct,
+    reload,
     productById,
     collectionById,
     collectionsAt,

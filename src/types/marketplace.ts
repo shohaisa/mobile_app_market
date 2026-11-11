@@ -46,6 +46,11 @@ export interface ProductPhoto {
   urls: ProductPhotoUrls;
 }
 
+export interface PriceBreak {
+  minQuantity: number;
+  price: number;
+}
+
 export interface Product {
   id: string;
   title: string;
@@ -53,6 +58,7 @@ export interface Product {
   collectionId: string;
   photos: ProductPhoto[];
   price: number;
+  priceBreaks: PriceBreak[];
   oldPrice?: number | undefined;
   rating: number;
   reviewCount: number;

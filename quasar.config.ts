@@ -205,6 +205,10 @@ export default defineConfig((/* ctx */) => {
     // https://v2.quasar.dev/quasar-cli-vite/developing-cordova-apps/configuring-cordova
     cordova: {},
 
+    bin: {
+      linuxAndroidStudio: '/snap/android-studio/current/bin/studio.sh'
+    },
+
     // https://v2.quasar.dev/quasar-cli-vite/developing-capacitor-apps/configuring-capacitor
     capacitor: {
       hideSplashscreen: true

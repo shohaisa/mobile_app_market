@@ -6,7 +6,7 @@
         <q-btn flat dense no-caps color="primary" label="Сбросить" @click="$emit('reset')" />
       </div>
 
-      <div class="text-caption text-weight-medium q-mb-xs">Цена, ₽</div>
+      <div class="text-caption text-weight-medium q-mb-xs">Цена, сом</div>
       <div class="row q-col-gutter-sm q-mb-md">
         <div class="col-6">
           <q-input v-model.number="draft.minPrice" outlined dense type="number" label="от" />
