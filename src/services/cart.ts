@@ -1,3 +1,4 @@
+import { priceForQuantity } from '@/composables/useMoney';
 import { apiRequest } from '@/services/http';
 import { photoUrl, primaryPhoto, productFromSummary, type CatalogProductPayload } from '@/services/products';
 import type { CartItem } from '@/types/marketplace';
@@ -15,13 +16,15 @@ interface CartResponse {
 
 function mapLine(line: CartLinePayload): CartItem {
   const product = productFromSummary(line.product);
+  const price = priceForQuantity(product.price, product.priceBreaks, line.quantity);
 
   return {
     lineId: line.id,
     productId: product.id,
     title: product.title,
     image: photoUrl(primaryPhoto(product.photos), 'small') ?? '',
-    price: product.price,
+    price,
+    ...(price < product.price ? { oldPrice: product.price } : {}),
     qty: line.quantity,
     stock: product.stock ?? 0,
   };

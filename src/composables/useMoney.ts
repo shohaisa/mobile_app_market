@@ -1,11 +1,22 @@
-const formatter = new Intl.NumberFormat('ru-RU', {
+import type { PriceBreak } from '@/types/marketplace';
+
+const formatter = new Intl.NumberFormat('ru-KG', {
   style: 'currency',
-  currency: 'RUB',
+  currency: 'KGS',
   maximumFractionDigits: 0,
 });
 
 export function formatMoney(value: number): string {
   return formatter.format(value);
+}
+
+export function priceForQuantity(price: number, breaks: PriceBreak[], quantity: number): number {
+  const matched = breaks.filter((tier) => tier.minQuantity <= quantity);
+  if (matched.length === 0) {
+    return price;
+  }
+
+  return Math.min(...matched.map((tier) => tier.price));
 }
 
 export function discountPercent(price: number, oldPrice?: number): number | null {

@@ -29,6 +29,9 @@
       />
     </div>
     <PriceBlock class="q-mt-sm" :price="product.price" :old-price="product.oldPrice" size="sm" />
+    <div v-if="nextTier" class="product-card__tier">
+      от {{ nextTier.minQuantity }} шт — {{ formatMoney(nextTier.price) }} за шт
+    </div>
     <div class="product-card__title line-clamp-2">{{ product.title }}</div>
     <div class="product-card__meta muted">
       <q-icon name="star" size="14px" color="warning" />
@@ -43,7 +46,7 @@ import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import PriceBlock from '@/components/PriceBlock.vue';
 import { hapticLight } from '@/composables/useHaptics';
-import { discountPercent } from '@/composables/useMoney';
+import { discountPercent, formatMoney } from '@/composables/useMoney';
 import { buyerErrorMessage } from '@/services/http';
 import { photoUrl, primaryPhoto } from '@/services/products';
 import { useFavoritesStore } from '@/stores/favorites';
@@ -56,6 +59,7 @@ const $q = useQuasar();
 const fav = useFavoritesStore();
 const user = useUserStore();
 const sale = computed(() => discountPercent(props.product.price, props.product.oldPrice));
+const nextTier = computed(() => props.product.priceBreaks[0]);
 const cover = computed(() => photoUrl(primaryPhoto(props.product.photos), 'small'));
 
 function open() {
@@ -104,6 +108,18 @@ async function onFav() {
   top: 6px;
   right: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.product-card__tier {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #eef4ff;
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.35;
 }
 
 .product-card__title {

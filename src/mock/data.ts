@@ -29,7 +29,7 @@ export const banners: Banner[] = [
   },
   {
     id: 'b3',
-    title: 'Доставка от 99 ₽',
+    title: 'Доставка от 99 сом',
     subtitle: 'В пункт выдачи по всему городу',
     image: img('furniture/annibale-colombo-sofa'),
   },
@@ -39,7 +39,7 @@ const sellerMarket: Product['seller'] = { id: 's1', name: 'Маркет Офиц
 const sellerHome: Product['seller'] = { id: 's2', name: 'ДомМаркет', rating: 4.7 };
 const sellerStyle: Product['seller'] = { id: 's3', name: 'Style Hub', rating: 4.8 };
 
-export const products: Product[] = [
+const listed: Omit<Product, 'priceBreaks'>[] = [
   {
     id: 'p1',
     title: 'Смартфон Aurora X12 256 ГБ',
@@ -406,3 +406,8 @@ export const products: Product[] = [
     reviews: [],
   },
 ];
+
+export const products: Product[] = listed.map((product) => ({
+  ...product,
+  priceBreaks: [],
+}));

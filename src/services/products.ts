@@ -1,5 +1,5 @@
 import { ApiError, apiRequest } from '@/services/http';
-import type { Product, ProductPhoto, ProductPhotoUrls, Seller } from '@/types/marketplace';
+import type { PriceBreak, Product, ProductPhoto, ProductPhotoUrls, Seller } from '@/types/marketplace';
 
 export const PRODUCT_IMAGE_TYPES = ['jpeg', 'png', 'webp', 'heic', 'heif', 'avif'] as const;
 export const PRODUCT_IMAGE_MAX_KB = 8192;
@@ -31,11 +31,17 @@ interface PhotoPayload {
   urls?: PhotoUrlsPayload;
 }
 
+interface PriceBreakPayload {
+  min_quantity: number;
+  price: number;
+}
+
 interface ProductCardPayload {
   name: string;
   description: string;
   photos: PhotoPayload[];
   price: number;
+  price_breaks?: PriceBreakPayload[];
   stock: number;
   seller: ProductSeller | null;
   collection: ProductCollection | null;
@@ -145,6 +151,16 @@ function mapSeller(seller: ProductSeller | null): Seller | null {
   };
 }
 
+function mapPriceBreaks(breaks: PriceBreakPayload[] | undefined): PriceBreak[] {
+  return (breaks ?? [])
+    .filter((item) => item.min_quantity > 1 && Number.isFinite(item.price))
+    .map((item) => ({
+      minQuantity: item.min_quantity,
+      price: item.price / MINOR_UNITS,
+    }))
+    .sort((left, right) => left.minQuantity - right.minQuantity);
+}
+
 function mapProduct(id: string, payload: ProductCardPayload): Product {
   return {
     id,
@@ -153,6 +169,7 @@ function mapProduct(id: string, payload: ProductCardPayload): Product {
     collectionId: payload.collection ? String(payload.collection.id) : '',
     photos: (payload.photos ?? []).map(mapPhoto),
     price: payload.price / MINOR_UNITS,
+    priceBreaks: mapPriceBreaks(payload.price_breaks),
     rating: payload.rating_avg,
     reviewCount: payload.reviews_count,
     soldCount: 0,
@@ -167,7 +184,7 @@ export function productFromSummary(item: CatalogProductPayload): Product {
   return mapProduct(String(item.id), item);
 }
 
-export async function fetchProducts(query: ProductQuery = {}): Promise<ProductList> {
+export async function fetchProducts(query: ProductQuery = {}, token?: string | null): Promise<ProductList> {
   const params = new URLSearchParams();
   const name = query.q?.trim();
   if (name) {
@@ -185,7 +202,9 @@ export async function fetchProducts(query: ProductQuery = {}): Promise<ProductLi
   params.set('page', String(query.page ?? 1));
   params.set('per_page', String(query.perPage ?? PAGE_SIZE));
 
-  const response = await apiRequest<ProductListResponse>(`/v1/products?${params.toString()}`);
+  const response = await apiRequest<ProductListResponse>(`/v1/products?${params.toString()}`, {
+    ...(token ? { token } : {}),
+  });
 
   return {
     products: response.data.map((item) => mapProduct(String(item.id), item)),
@@ -195,8 +214,10 @@ export async function fetchProducts(query: ProductQuery = {}): Promise<ProductLi
   };
 }
 
-export async function fetchProduct(id: string): Promise<Product> {
-  const response = await apiRequest<ProductShowResponse>(`/v1/products/${id}`);
+export async function fetchProduct(id: string, token?: string | null): Promise<Product> {
+  const response = await apiRequest<ProductShowResponse>(`/v1/products/${id}`, {
+    ...(token ? { token } : {}),
+  });
 
   return mapProduct(id, response.data);
 }

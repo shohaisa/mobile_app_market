@@ -62,6 +62,12 @@ export const useUserStore = defineStore('user', () => {
       useFavoritesStore().refresh(),
       useOrdersStore().refresh(),
     ]);
+    await reloadCatalog();
+  }
+
+  async function reloadCatalog(): Promise<void> {
+    const { useCatalogStore } = await import('@/stores/catalog');
+    await useCatalogStore().reload();
   }
 
   async function clearBuyerLists(): Promise<void> {
@@ -103,6 +109,7 @@ export const useUserStore = defineStore('user', () => {
     user.value = null;
     profileComplete.value = false;
     await clearBuyerLists();
+    await reloadCatalog();
     await saveToken(null);
     if (current) {
       try {
